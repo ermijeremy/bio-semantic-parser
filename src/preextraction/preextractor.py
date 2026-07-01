@@ -6,6 +6,7 @@ normalization for PubMed articles, then classifies each entity's containing
 clause for negation using an NLI cross-encoder.
 """
 import spacy
+from gliner import GLiNER
 
 from src.preextraction.ner_tagger import NERTagger
 from src.preextraction.negation_detector import NegationDetector
@@ -13,12 +14,14 @@ from src.preextraction.doi_extractor import DOIExtractor
 from src.preextraction.accession_detector import AccessionDetector
 from src.preextraction.pubtator_client import fetch_pubtator_entities
 
+from src.schema.taxonomy import GLINER_LABELS, GLINER_MAP
 
 class Preextractor:
     def __init__(self):
         self._nlp_bc5 = spacy.load("en_ner_bc5cdr_md")     # DISEASE, CHEMICAL
         self._nlp_jnl = spacy.load("en_ner_jnlpba_md")     # DNA, RNA, PROTEIN, CELL_TYPE, CELL_LINE
         self._nlp_bio = spacy.load("en_ner_bionlp13cg_md")  # GENE_OR_GENE_PRODUCT, CANCER, ORGANISM, TISSUE
+        self._gliner  = GLiNER.from_pretrained("Ihor/gliner-biomed-large-v1.0")
 
         self.negation_detector  = NegationDetector()
         self.doi_extractor      = DOIExtractor()
@@ -29,10 +32,13 @@ class Preextractor:
         doc2 = self._nlp_jnl(text)
         doc3 = self._nlp_bio(text)
 
+        gliner_ents = self._gliner.predict_entities(text, GLINER_LABELS, threshold=0.5, flat_ner=True)
+
         span_data = (
             [(e.start_char, e.end_char, e.label_) for e in doc1.ents]
             + [(e.start_char, e.end_char, e.label_) for e in doc2.ents]
             + [(e.start_char, e.end_char, e.label_) for e in doc3.ents]
+            + [(e["start"], e["end"], GLINER_MAP.get(e["label"], "OTHER")) for e in gliner_ents]
         )
         all_spans = []
         for start, end, label in span_data:
