@@ -32,21 +32,48 @@ class Preextractor:
         doc2 = self._nlp_jnl(text)
         doc3 = self._nlp_bio(text)
 
-        gliner_ents = self._gliner.predict_entities(text, GLINER_LABELS, threshold=0.5, flat_ner=True)
-
-        span_data = (
+        expert_span_data = (
             [(e.start_char, e.end_char, e.label_) for e in doc1.ents]
             + [(e.start_char, e.end_char, e.label_) for e in doc2.ents]
             + [(e.start_char, e.end_char, e.label_) for e in doc3.ents]
-            + [(e["start"], e["end"], GLINER_MAP.get(e["label"], "OTHER")) for e in gliner_ents]
         )
-        all_spans = []
-        for start, end, label in span_data:
+        expert_spans = []
+        for start, end, label in expert_span_data:
             span = doc1.char_span(start, end, label=label, alignment_mode="expand")
             if span is not None:
-                all_spans.append(span)
+                expert_spans.append(span)
+        
+        filtered_expert_spans = spacy.util.filter_spans(expert_spans)
 
-        doc1.ents = spacy.util.filter_spans(all_spans)
+        # Run GLiNER as a fallback
+        gliner_ents = self._gliner.predict_entities(text, GLINER_LABELS, threshold=0.5, flat_ner=True)
+        gliner_span_data = [(e["start"], e["end"], GLINER_MAP.get(e["label"], "OTHER")) for e in gliner_ents]
+        
+        gliner_spans = []
+        for start, end, label in gliner_span_data:
+            span = doc1.char_span(start, end, label=label, alignment_mode="expand")
+            if span is not None:
+                gliner_spans.append(span)
+
+        # Filter GLiNER spans
+        filtered_gliner_spans = spacy.util.filter_spans(gliner_spans)
+
+        # Merge them - expert models take priority
+        final_spans = list(filtered_expert_spans)
+        
+        for g_span in filtered_gliner_spans:
+            overlap = False
+            for e_span in filtered_expert_spans:
+                # Two spans overlap if they share at least one token
+                if max(g_span.start, e_span.start) < min(g_span.end, e_span.end):
+                    overlap = True
+                    break
+            if not overlap:
+                final_spans.append(g_span)
+                
+        final_spans.sort(key=lambda s: s.start)
+
+        doc1.ents = final_spans
         return doc1
 
     def process(self, chunk: dict) -> dict:
