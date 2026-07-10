@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BioNER Model Comparison</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header>
+    <h1>BioNER Model Comparison</h1>
+    <p class="sub">
+      {{ models|length }} models &middot;
+      gold corpus: {{ corpus.n_sentences }} sentences / {{ corpus.total_gold_entities }} entities /
+      {{ corpus.n_schema_types }} schema types
+      <span class="pill">T1 {{ corpus.tier1_entities }}</span>
+      <span class="pill">T2 {{ corpus.tier2_entities }}</span>
+      <span class="pill">T3 {{ corpus.tier3_entities }}</span>
+    </p>
+  </header>
+
+  <main>
+    <section class="panel models-panel">
+      <div class="panel-head">
+        <h2>Models</h2>
+        <div class="model-actions">
+          <button id="select-all" class="btn-mini">All</button>
+          <button id="select-none" class="btn-mini">None</button>
+          <button id="select-cpu" class="btn-mini" title="Deselect GPU-preferring models">CPU-friendly</button>
+        </div>
+      </div>
+      <div id="model-list">
+        {% for m in models %}
+        <label class="model-row" data-key="{{ m.key }}" data-gpu="{{ 1 if m.prefers_gpu else 0 }}">
+          <input type="checkbox" class="model-cb" value="{{ m.key }}"
+                 {% if m.key == 'gliner_biomed_large' or m.key == 'scispacy_ensemble' %}checked{% endif %} />
+          <span class="model-meta">
+            <span class="model-name">{{ m.name }}{% if m.prefers_gpu %} <span class="gpu-tag">GPU</span>{% endif %}</span>
+            <span class="model-family">{{ m.family }}</span>
+            <span class="model-desc">{{ m.description }}</span>
+            <span class="model-id">{{ m.model_id }}</span>
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+      <p class="note">Heavy checkpoints download &amp; load on first use. First run of a model is a cold start.</p>
+    </section>
+
+    <section class="panel work-panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="extract">Extract</button>
+        <button class="tab" data-tab="benchmark">Benchmark</button>
+      </div>
+
+      <!-- EXTRACT TAB -->
+      <div class="tab-body" id="tab-extract">
+        <div class="controls">
+          <select id="sample-select">
+            <option value="">— insert a sample sentence —</option>
+          </select>
+        </div>
+        <textarea id="input-text" rows="4"
+          placeholder="Paste a biomedical sentence…">BRCA1 and BRCA2 mutations confer a high lifetime risk of breast and ovarian cancer.</textarea>
+        <div class="controls">
+          <button id="run-extract" class="btn-primary">Extract entities</button>
+          <span id="extract-status" class="status"></span>
+        </div>
+        <div id="extract-results"></div>
+      </div>
+
+      <!-- BENCHMARK TAB -->
+      <div class="tab-body hidden" id="tab-benchmark">
+        <div class="controls">
+          <button id="run-benchmark" class="btn-primary">Run benchmark on gold corpus</button>
+          <label class="force-lbl"><input type="checkbox" id="force-bench" /> ignore cache</label>
+          <span id="benchmark-status" class="status"></span>
+        </div>
+        <p class="note">Scores selected models on all {{ corpus.n_sentences }} sentences. Slow models
+          (e.g. HunFlair2 ~1.2 s/sentence) take a while.</p>
+        <div id="benchmark-results"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.__ENTITY_TYPES__ = {{ entity_types|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

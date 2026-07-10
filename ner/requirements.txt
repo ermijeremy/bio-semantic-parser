@@ -1,0 +1,29 @@
+# ── BioNER comparison harness ────────────────────────────────────────────────
+# Core (UI + harness) — always needed:
+flask>=3.0
+
+# Model backends are OPTIONAL and loaded lazily. Install only the ones for the
+# models you want to run. Grouped by the "extras" reported in the registry.
+
+# GLiNER (zero-shot): gliner_biomed_large / base / bi_large
+gliner>=0.2.13
+torch>=2.0
+
+# scispaCy ensemble (also used by HunFlair2 tokenizer):
+scispacy>=0.5.4
+spacy>=3.7,<3.8
+# scispaCy NER model packages:
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_ner_bc5cdr_md-0.5.4.tar.gz
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_ner_jnlpba_md-0.5.4.tar.gz
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_ner_bionlp13cg_md-0.5.4.tar.gz
+
+# Transformer / BioBERT fixed-taxonomy models:
+#   bent_gene, bent_disease, pubmedbert_protein_structure,
+#   biomedical_ner_all, biobert_diseases, biobert_chemical, biobert_genetic
+transformers>=4.30
+
+# HunFlair2 (Flair):
+flair>=0.13
+
+# Stanza BioNLP13CG:
+stanza>=1.5
