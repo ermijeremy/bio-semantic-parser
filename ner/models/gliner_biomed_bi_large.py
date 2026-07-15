@@ -7,6 +7,7 @@ zeroed its score — pin a compatible gliner build if you see that error.
 """
 from __future__ import annotations
 
+from . import _cache  # noqa: F401
 from ..base import BaseNERModel, Entity
 from ..schema import GLINER_LABELS, GLINER_MAP
 
@@ -26,7 +27,8 @@ class Model(BaseNERModel):
     def load(self) -> None:
         import torch
         from gliner import GLiNER
-        self._model = GLiNER.from_pretrained(self.model_id)
+        hub_dir = str(_cache.CACHE_DIR / "hub")
+        self._model = GLiNER.from_pretrained(self.model_id, cache_dir=hub_dir)
         if torch.cuda.is_available():
             self._model = self._model.to("cuda")
 

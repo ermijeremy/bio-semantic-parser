@@ -1,11 +1,11 @@
-"""GLiNER-BioMed Base — Ihor/gliner-biomed-base-v1.0.
+"""GLiNER-BioMed Base (cross-encoder) — Ihor/gliner-biomed-base-v1.0.
 
-Smaller/faster cross-encoder variant. Useful lower-latency point on the
-accuracy/speed curve versus the large model. (Researched addition — not in the
-original notebook.)
+Smaller GLiNER cross-encoder. Lower latency/memory than Large while
+retaining broad schema coverage.
 """
 from __future__ import annotations
 
+from . import _cache  # noqa: F401
 from ..base import BaseNERModel, Entity
 from ..schema import GLINER_LABELS, GLINER_MAP
 
@@ -16,7 +16,7 @@ class Model(BaseNERModel):
     key = "gliner_biomed_base"
     name = "GLiNER-BioMed Base"
     model_id = "Ihor/gliner-biomed-base-v1.0"
-    description = "Smaller GLiNER cross-encoder. Lower latency / memory than Large, slightly lower F1."
+    description = "Smaller GLiNER cross-encoder. Lower latency/memory than Large."
     license = "Apache-2.0"
     homepage = "https://huggingface.co/Ihor/gliner-biomed-base-v1.0"
     extras = ("gliner", "torch")
@@ -25,7 +25,8 @@ class Model(BaseNERModel):
     def load(self) -> None:
         import torch
         from gliner import GLiNER
-        self._model = GLiNER.from_pretrained(self.model_id)
+        hub_dir = str(_cache.CACHE_DIR / "hub")
+        self._model = GLiNER.from_pretrained(self.model_id, cache_dir=hub_dir)
         if torch.cuda.is_available():
             self._model = self._model.to("cuda")
 

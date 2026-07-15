@@ -5,6 +5,7 @@ in the notebook benchmark (partial F1 ~0.88, ~95% schema coverage).
 """
 from __future__ import annotations
 
+from . import _cache  # noqa: F401 — sets HF_HOME before gliner/torch import
 from ..base import BaseNERModel, Entity
 from ..schema import GLINER_LABELS, GLINER_MAP
 
@@ -24,7 +25,8 @@ class Model(BaseNERModel):
     def load(self) -> None:
         import torch
         from gliner import GLiNER
-        self._model = GLiNER.from_pretrained(self.model_id)
+        hub_dir = str(_cache.CACHE_DIR / "hub")
+        self._model = GLiNER.from_pretrained(self.model_id, cache_dir=hub_dir)
         if torch.cuda.is_available():
             self._model = self._model.to("cuda")
 

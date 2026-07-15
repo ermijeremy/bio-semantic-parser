@@ -164,7 +164,22 @@ for e in sorted(model.predict(text), key=lambda x: x.start):
     print(f"  [{{e.label}} / {{tier_of(e.label)}}] {{e.text!r}}  ({{e.score:.2f}})")
 """))
 
-    cells.append(md("""## 5 · Benchmark on the gold corpus
+    cells.append(md("""## 5 · Try your own text
+
+Edit the `text` string below and re-run this cell to test the model on your own
+input — highlighted spans are printed as `[label / tier] "text" (score)`."""))
+    cells.append(code("""
+# ✏️  Replace this with your own biomedical text, then re-run the cell.
+text = \"\"\"BRCA1 and BRCA2 mutations confer a high lifetime risk of breast and ovarian cancer.\"\"\"
+
+from ner.schema import tier_of
+ents = sorted(model.predict(text), key=lambda x: x.start)
+print(f"{len(ents)} entities found in {len(text)} chars\\n")
+for e in ents:
+    print(f"  [{e.label} / {tier_of(e.label)}] {e.text!r}  ({e.score:.2f})")
+"""))
+
+    cells.append(md("""## 6 · Benchmark on the gold corpus
 
 Exact & partial (overlap + same-type) precision/recall/F1 over all 69 sentences,
 plus tier-1 F1, schema coverage, latency, and GPU peak memory."""))
@@ -188,7 +203,7 @@ if report["errors"]:
     print(f"\\n{len(report['errors'])} sentence error(s); first:", report["errors"][0])
 """))
 
-    cells.append(md("## 6 · Per-type F1 & summary plot"))
+    cells.append(md("## 7 · Per-type F1 & summary plot"))
     cells.append(code("""
 import matplotlib.pyplot as plt
 
@@ -222,7 +237,7 @@ plt.savefig(f"ner_report_{KEY}.png", dpi=140, bbox_inches="tight")
 plt.show()
 """))
 
-    cells.append(md("## 7 · Save the JSON report"))
+    cells.append(md("## 8 · Save the JSON report"))
     cells.append(code("""
 import json
 

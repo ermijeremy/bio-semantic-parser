@@ -6,6 +6,7 @@ rather than an inline component.
 """
 from __future__ import annotations
 
+from . import _cache  # noqa: F401 — sets FLAIR_CACHE_ROOT before flair import
 from ..base import BaseNERModel, Entity
 
 HF2_MAP = {
@@ -25,6 +26,9 @@ class Model(BaseNERModel):
     prefers_gpu = True
 
     def load(self) -> None:
+        import flair
+        # Point Flair's cache at our local directory.
+        flair.cache_root = _cache.CACHE_DIR / "flair"
         from flair.models.prefixed_tagger import PrefixedSequenceTagger
         self._tagger = PrefixedSequenceTagger.load(self.model_id)
 

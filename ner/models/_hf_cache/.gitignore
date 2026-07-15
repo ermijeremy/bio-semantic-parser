@@ -1,0 +1,7 @@
+# Model weights downloaded at runtime — do NOT commit to git.
+# The _hf_cache/ directory is populated automatically on first run.
+hub/
+flair/
+torch/
+stanza/
+xet/

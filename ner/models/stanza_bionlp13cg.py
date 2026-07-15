@@ -6,7 +6,9 @@ character-LM + BiLSTM + CRF. The BioNLP13CG package covers 16 entity types
 point of comparison.
 """
 from __future__ import annotations
+from pathlib import Path
 
+from . import _cache  # noqa: F401 — sets STANZA_RESOURCES_DIR before stanza import
 from ..base import BaseNERModel, Entity
 
 # BioNLP13CG NER labels -> BioCypher schema.
@@ -29,6 +31,21 @@ _MAP = {
     "DEVELOPING_ANATOMICAL_STRUCTURE": "DEVELOPMENTAL_STAGE",
 }
 
+# Flat paths stanza 1.14+ uses: <stanza_dir>/en/<processor>/<package>.pt
+_REQUIRED_FILES = [
+    "en/ner/bionlp13cg.pt",
+    "en/forward_charlm/pubmed.pt",
+    "en/backward_charlm/pubmed.pt",
+    "en/pretrain/biomed.pt",
+    "en/tokenize/craft.pt",
+]
+
+
+def _models_present(stanza_dir: str) -> bool:
+    """Return True if the required model files are already in the local dir."""
+    base = Path(stanza_dir)
+    return all((base / f).exists() for f in _REQUIRED_FILES)
+
 
 class Model(BaseNERModel):
     key = "stanza_bionlp13cg"
@@ -42,10 +59,25 @@ class Model(BaseNERModel):
 
     def load(self) -> None:
         import stanza
-        # Download is idempotent; only fetches the package the first time.
-        stanza.download("en", package="bionlp13cg", processors={"tokenize": "craft", "ner": "bionlp13cg"}, verbose=False)
+        stanza_dir = str(_cache.CACHE_DIR / "stanza")
+
+        # Only call download() when files are genuinely missing (avoids the
+        # mandatory network HEAD-check that stanza.download() always performs).
+        if not _models_present(stanza_dir):
+            stanza.download(
+                "en",
+                package="bionlp13cg",
+                processors={"tokenize": "craft", "ner": "bionlp13cg"},
+                model_dir=stanza_dir,
+                verbose=False,
+            )
+
         self._nlp = stanza.Pipeline(
-            "en", package="bionlp13cg", processors={"tokenize": "craft", "ner": "bionlp13cg"}, verbose=False,
+            "en",
+            package="bionlp13cg",
+            processors={"tokenize": "craft", "ner": "bionlp13cg"},
+            dir=stanza_dir,
+            verbose=False,
         )
 
     def _predict(self, text: str) -> list[Entity]:
