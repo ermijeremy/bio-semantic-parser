@@ -7,16 +7,37 @@ from __future__ import annotations
 
 from ..base import BaseNERModel, Entity
 
-# Raw scispaCy label -> schema type. Unmapped labels pass through uppercased.
+# Raw scispaCy label -> schema type. Covers the full raw-label sets of all three
+# pipelines: BC5CDR (DISEASE, CHEMICAL), JNLPBA (DNA, RNA, PROTEIN, CELL_TYPE,
+# CELL_LINE), and BioNLP13CG (the 16 broad-bio types). Kept aligned with the
+# Stanza BioNLP13CG mapping (ner/models/stanza_bionlp13cg.py) so both taggers map
+# identical raw types to identical schema types. Unmapped labels pass through
+# uppercased here; the preextractor merge falls them back to OTHER instead.
 SCISPACY_MAP = {
-    "DISEASE": "DISEASE", "CHEMICAL": "SMALL_MOLECULE",
-    "SIMPLE_CHEMICAL": "SMALL_MOLECULE",
+    # ── BC5CDR ────────────────────────────────────────────────────────────────
+    "DISEASE": "DISEASE",
+    "CHEMICAL": "SMALL_MOLECULE",
+    # ── JNLPBA ────────────────────────────────────────────────────────────────
     "DNA": "NON_CODING_RNA", "RNA": "NON_CODING_RNA",
     "PROTEIN": "PROTEIN", "CELL_TYPE": "CELL_TYPE", "CELL_LINE": "CELL_LINE",
-    "GENE_OR_GENE_PRODUCT": "GENE", "CANCER": "CANCER",
-    "ORGANISM": "ORGANISM", "TISSUE": "TISSUE",
+    # ── BioNLP13CG (16 types) ─────────────────────────────────────────────────
+    "GENE_OR_GENE_PRODUCT": "GENE",
+    "SIMPLE_CHEMICAL": "SMALL_MOLECULE",
+    "AMINO_ACID": "SMALL_MOLECULE",
+    "CANCER": "CANCER",
+    "CELL": "CELL_TYPE",
     "CELLULAR_COMPONENT": "CELLULAR_COMPONENT",
-    "ORGAN": "ANATOMY", "MULTI-TISSUE_STRUCTURE": "ANATOMY",
+    "ORGANISM": "ORGANISM",
+    "ORGANISM_SUBSTANCE": "SMALL_MOLECULE",
+    "TISSUE": "TISSUE",
+    "ORGAN": "ANATOMY",
+    "ORGANISM_SUBDIVISION": "ANATOMY",
+    "MULTI-TISSUE_STRUCTURE": "ANATOMY",   # scispaCy emits the hyphen form …
+    "MULTI_TISSUE_STRUCTURE": "ANATOMY",   # … and the underscore form in some builds
+    "ANATOMICAL_SYSTEM": "ANATOMY",
+    "IMMATERIAL_ANATOMICAL_ENTITY": "ANATOMY",
+    "PATHOLOGICAL_FORMATION": "PHENOTYPE",
+    "DEVELOPING_ANATOMICAL_STRUCTURE": "DEVELOPMENTAL_STAGE",
 }
 
 _PACKAGES = ("en_ner_bc5cdr_md", "en_ner_jnlpba_md", "en_ner_bionlp13cg_md")

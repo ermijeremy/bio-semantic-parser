@@ -9,7 +9,10 @@ from . import _cache  # noqa: F401
 from ..base import BaseNERModel, Entity
 from ..schema import GLINER_LABELS, GLINER_MAP
 
-_THRESHOLD = 0.5
+# Lower than GLiNER-Large's 0.5: in the ensemble, Base runs as a secondary
+# recovery sweep over regions the larger models left uncovered, so it trades a
+# little precision for recall on borderline spans.
+_THRESHOLD = 0.40
 
 
 class Model(BaseNERModel):
