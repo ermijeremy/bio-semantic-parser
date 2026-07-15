@@ -25,17 +25,24 @@ class NERTagger:
             if not NERTagger._is_valid(ent.text):
                 continue
             normalized = ent.text.lower().strip()
-            if normalized in seen:
+
+            key = (normalized, ent.start_char)
+            if key in seen:
                 continue
-            seen.add(normalized)
+            seen.add(key)
+
+            ner_confidence = ent._.score  if ent.has_extension("score")  else 1.0
+            source         = ent._.source if ent.has_extension("source") else ""
             entities.append({
-                "text":       ent.text,
-                "normalized": normalized,
-                "label":      ent.label_,
-                "start":      ent.start_char,
-                "end":        ent.end_char,
-                "negated":    False,
-                "assertion":  "PRESENT",
-                "confidence": 1.0,
+                "text":           ent.text,
+                "normalized":     normalized,
+                "label":          ent.label_,
+                "start":          ent.start_char,
+                "end":            ent.end_char,
+                "negated":        False,
+                "assertion":      "PRESENT",
+                "ner_confidence": round(float(ner_confidence), 3),
+                "source":         source,
+                "confidence":     1.0,
             })
         return entities

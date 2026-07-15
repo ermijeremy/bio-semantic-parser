@@ -13,6 +13,9 @@ import re
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
+from ner.models import _cache
+
+
 
 _CONTRASTIVE = re.compile(
     r'\b(but not|however|although|whereas|while yet|despite|'
@@ -49,9 +52,10 @@ class NegationDetector:
     _THRESHOLD = 0.40  # contradiction score above this → ABSENT
 
     def __init__(self, hypothesis: str = _DEFAULT_HYPOTHESIS):
+        hub_dir = str(_cache.CACHE_DIR / "hub")
         self._hypothesis = hypothesis
-        self._tokenizer  = AutoTokenizer.from_pretrained(self._MODEL)
-        self._model      = AutoModelForSequenceClassification.from_pretrained(self._MODEL)
+        self._tokenizer  = AutoTokenizer.from_pretrained(self._MODEL, cache_dir=hub_dir)
+        self._model      = AutoModelForSequenceClassification.from_pretrained(self._MODEL, cache_dir=hub_dir)
         self._model.eval()
         # Label order: {0: contradiction, 1: entailment, 2: neutral}
     
