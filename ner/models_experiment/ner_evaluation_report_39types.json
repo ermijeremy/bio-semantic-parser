@@ -1,0 +1,4422 @@
+{
+  "generated_at": "2026-06-30T13:49:22.098689",
+  "schema_version": "39 entity types (BioCypher)",
+  "corpus_size": 69,
+  "total_gold_entities": 244,
+  "tier_breakdown": {
+    "tier1_detectable": [
+      "ANATOMY",
+      "BIOLOGICAL_PROCESS",
+      "CANCER",
+      "CELLULAR_COMPONENT",
+      "CELL_LINE",
+      "CELL_TYPE",
+      "DISEASE",
+      "GENE",
+      "GENOMIC_VARIANT",
+      "MACROMOLECULAR_COMPLEX",
+      "MOLECULAR_FUNCTION",
+      "NON_CODING_RNA",
+      "ORGANISM",
+      "PATHWAY",
+      "PHENOTYPE",
+      "PROTEIN",
+      "SEQUENCE_VARIANT",
+      "SMALL_MOLECULE",
+      "SYMPTOM",
+      "TISSUE"
+    ],
+    "tier2_moderate": [
+      "DEVELOPMENTAL_STAGE",
+      "ENHANCER",
+      "EPIGENOMIC_FEATURE",
+      "EXPERIMENTAL_FACTOR",
+      "HAPLOTYPE",
+      "MOLECULAR_INTERACTION",
+      "PROMOTER",
+      "REACTION",
+      "REGULATORY_REGION",
+      "TRANSCRIPT",
+      "TRANSCRIPTION_FACTOR_BINDING_SITE"
+    ],
+    "tier3_hard": [
+      "EXON",
+      "GENOTYPE",
+      "MOTIF",
+      "OTHER",
+      "STRUCTURAL_VARIANT",
+      "SUPER_ENHANCER",
+      "TAD",
+      "THREE_D_GENOME_STRUCTURE"
+    ]
+  },
+  "models_evaluated": [
+    "scispaCy Ensemble (baseline)",
+    "GLiNER-BioMed-large",
+    "GLiNER-BioMed-bi-large",
+    "HunFlair2",
+    "BENT-PubMedBERT-Gene",
+    "BENT-PubMedBERT-Disease",
+    "PubMedBERT-ProteinStructure"
+  ],
+  "results": [
+    {
+      "model": "scispaCy Ensemble (baseline)",
+      "overall": {
+        "exact_precision": 0.096,
+        "exact_recall": 0.094,
+        "exact_f1": 0.095,
+        "partial_precision": 0.865,
+        "partial_recall": 0.571,
+        "partial_f1": 0.688,
+        "tp_exact": 22,
+        "fp": 31,
+        "fn": 100
+      },
+      "tier1_only": {
+        "exact_precision": 0.101,
+        "exact_recall": 0.12,
+        "exact_f1": 0.11,
+        "partial_precision": 0.913,
+        "partial_recall": 0.727,
+        "partial_f1": 0.809,
+        "tp_exact": 22,
+        "fp": 19,
+        "fn": 50
+      },
+      "type_coverage_pct": 28.9,
+      "types_predicted": [
+        "CANCER",
+        "CELL",
+        "CELLULAR_COMPONENT",
+        "CELL_LINE",
+        "CELL_TYPE",
+        "DISEASE",
+        "GENE",
+        "NON_CODING_RNA",
+        "ORGAN",
+        "ORGANISM",
+        "ORGANISM_SUBSTANCE",
+        "PROTEIN",
+        "SIMPLE_CHEMICAL",
+        "SMALL_MOLECULE",
+        "TISSUE"
+      ],
+      "avg_latency_ms": 34.3,
+      "p95_latency_ms": 65.5,
+      "gpu_peak_mb": 1754.0,
+      "per_type_partial_f1": {
+        "GENE": 0.958,
+        "SEQUENCE_VARIANT": 0,
+        "DEVELOPMENTAL_STAGE": 0,
+        "TRANSCRIPT": 0,
+        "BIOLOGICAL_PROCESS": 0,
+        "GENOMIC_VARIANT": 0,
+        "CELL_TYPE": 1.0,
+        "DISEASE": 0.985,
+        "CANCER": 0.923,
+        "EXON": 0,
+        "EPIGENOMIC_FEATURE": 0,
+        "PROTEIN": 0.976,
+        "MOLECULAR_INTERACTION": 0,
+        "PATHWAY": 0,
+        "SYMPTOM": 0,
+        "CELL_LINE": 0.5,
+        "ENHANCER": 0,
+        "GENOTYPE": 0,
+        "REACTION": 0,
+        "PHENOTYPE": 0,
+        "CELLULAR_COMPONENT": 1.0,
+        "ORGANISM": 0.889,
+        "EXPERIMENTAL_FACTOR": 0,
+        "PROMOTER": 0,
+        "SMALL_MOLECULE": 0.909,
+        "NON_CODING_RNA": 0.906,
+        "THREE_D_GENOME_STRUCTURE": 0,
+        "MACROMOLECULAR_COMPLEX": 0,
+        "ANATOMY": 0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0,
+        "TAD": 0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0,
+        "TISSUE": 0.8
+      },
+      "errors": []
+    },
+    {
+      "model": "GLiNER-BioMed-large",
+      "overall": {
+        "exact_precision": 0.14,
+        "exact_recall": 0.206,
+        "exact_f1": 0.166,
+        "partial_precision": 0.826,
+        "partial_recall": 0.931,
+        "partial_f1": 0.875,
+        "tp_exact": 48,
+        "fp": 60,
+        "fn": 16
+      },
+      "tier1_only": {
+        "exact_precision": 0.154,
+        "exact_recall": 0.213,
+        "exact_f1": 0.178,
+        "partial_precision": 0.902,
+        "partial_recall": 0.973,
+        "partial_f1": 0.936,
+        "tp_exact": 39,
+        "fp": 25,
+        "fn": 5
+      },
+      "type_coverage_pct": 94.7,
+      "types_predicted": [
+        "ANATOMY",
+        "BIOLOGICAL_PROCESS",
+        "CANCER",
+        "CELLULAR_COMPONENT",
+        "CELL_LINE",
+        "CELL_TYPE",
+        "DEVELOPMENTAL_STAGE",
+        "DISEASE",
+        "ENHANCER",
+        "EPIGENOMIC_FEATURE",
+        "EXON",
+        "EXPERIMENTAL_FACTOR",
+        "GENE",
+        "GENOMIC_VARIANT",
+        "GENOTYPE",
+        "HAPLOTYPE",
+        "MACROMOLECULAR_COMPLEX",
+        "MOLECULAR_FUNCTION",
+        "MOLECULAR_INTERACTION",
+        "NON_CODING_RNA",
+        "ORGANISM",
+        "PATHWAY",
+        "PHENOTYPE",
+        "PROMOTER",
+        "PROTEIN",
+        "REACTION",
+        "REGULATORY_REGION",
+        "SEQUENCE_VARIANT",
+        "SMALL_MOLECULE",
+        "SUPER_ENHANCER",
+        "SYMPTOM",
+        "TAD",
+        "THREE_D_GENOME_STRUCTURE",
+        "TISSUE",
+        "TRANSCRIPT",
+        "TRANSCRIPTION_FACTOR_BINDING_SITE"
+      ],
+      "avg_latency_ms": 109.8,
+      "p95_latency_ms": 152.3,
+      "gpu_peak_mb": 3715.4,
+      "per_type_partial_f1": {
+        "GENE": 0.98,
+        "SEQUENCE_VARIANT": 0.5,
+        "DEVELOPMENTAL_STAGE": 0.4,
+        "TRANSCRIPT": 0.857,
+        "BIOLOGICAL_PROCESS": 0.981,
+        "GENOMIC_VARIANT": 0.706,
+        "CELL_TYPE": 0.96,
+        "DISEASE": 0.963,
+        "CANCER": 1.0,
+        "EXON": 1.0,
+        "EPIGENOMIC_FEATURE": 0.816,
+        "PROTEIN": 0.958,
+        "MOLECULAR_INTERACTION": 0.476,
+        "PATHWAY": 1.0,
+        "SYMPTOM": 1.0,
+        "CELL_LINE": 0.857,
+        "ENHANCER": 0.857,
+        "GENOTYPE": 0.667,
+        "REACTION": 0.759,
+        "PHENOTYPE": 0.973,
+        "CELLULAR_COMPONENT": 1.0,
+        "ORGANISM": 0.911,
+        "EXPERIMENTAL_FACTOR": 0.857,
+        "PROMOTER": 0.909,
+        "SMALL_MOLECULE": 1.0,
+        "NON_CODING_RNA": 0.845,
+        "THREE_D_GENOME_STRUCTURE": 0.5,
+        "MACROMOLECULAR_COMPLEX": 1.0,
+        "ANATOMY": 1.0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0.727,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 1.0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0.75,
+        "TAD": 1.0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0.8,
+        "TISSUE": 0.571
+      },
+      "errors": []
+    },
+    {
+      "model": "GLiNER-BioMed-bi-large",
+      "overall": {
+        "exact_precision": 0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0,
+        "partial_recall": 0.0,
+        "partial_f1": 0,
+        "tp_exact": 0,
+        "fp": 0,
+        "fn": 233
+      },
+      "tier1_only": {
+        "exact_precision": 0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0,
+        "partial_recall": 0.0,
+        "partial_f1": 0,
+        "tp_exact": 0,
+        "fp": 0,
+        "fn": 183
+      },
+      "type_coverage_pct": 0.0,
+      "types_predicted": [],
+      "avg_latency_ms": 61.7,
+      "p95_latency_ms": 74.8,
+      "gpu_peak_mb": 5956.0,
+      "per_type_partial_f1": {
+        "GENE": 0,
+        "SEQUENCE_VARIANT": 0,
+        "DEVELOPMENTAL_STAGE": 0,
+        "TRANSCRIPT": 0,
+        "BIOLOGICAL_PROCESS": 0,
+        "GENOMIC_VARIANT": 0,
+        "CELL_TYPE": 0,
+        "DISEASE": 0,
+        "CANCER": 0,
+        "EXON": 0,
+        "EPIGENOMIC_FEATURE": 0,
+        "PROTEIN": 0,
+        "MOLECULAR_INTERACTION": 0,
+        "PATHWAY": 0,
+        "SYMPTOM": 0,
+        "CELL_LINE": 0,
+        "ENHANCER": 0,
+        "GENOTYPE": 0,
+        "REACTION": 0,
+        "PHENOTYPE": 0,
+        "CELLULAR_COMPONENT": 0,
+        "ORGANISM": 0,
+        "EXPERIMENTAL_FACTOR": 0,
+        "PROMOTER": 0,
+        "SMALL_MOLECULE": 0,
+        "NON_CODING_RNA": 0,
+        "THREE_D_GENOME_STRUCTURE": 0,
+        "MACROMOLECULAR_COMPLEX": 0,
+        "ANATOMY": 0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0,
+        "TAD": 0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0,
+        "TISSUE": 0
+      },
+      "errors": [
+        {
+          "sentence": "BRCA1 and BRCA2 mutations confer a high lifetime risk of breast and ov",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "TP53 is the most frequently mutated gene in human cancers, altered in ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "EGFR amplification drives oncogenic signalling in glioblastoma multifo",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "FOXO3 is associated with human longevity in multiple genome-wide assoc",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The daf-2 gene encodes the C. elegans insulin/IGF-1 receptor ortholog.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "mTOR complex 1 phosphorylates S6K1 and 4E-BP1 to promote cap-dependent",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The p53 tumour suppressor protein is stabilised by ATM-mediated phosph",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "SIRT1 deacetylates histone H3 at lysine 9 to silence heterochromatin.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Rapamycin inhibits mTORC1 by binding to the FKBP12-rapamycin complex.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The PRC2 complex trimethylates histone H3 at lysine 27 to repress gene",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Alternative splicing of BRAF exon 15 generates isoforms with distinct ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The EGFR transcript variant EGFRvIII lacks exons 2-7 and is constituti",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "miR-21 is upregulated in most human cancers and targets the tumour sup",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "lncRNA HOTAIR recruits PRC2 to silence HOXD genes during development.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "circRNA ciRS-7 acts as a sponge for miR-7, thereby modulating EGFR exp",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The V600E missense mutation in BRAF constitutively activates MAPK sign",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "rs4988235, a SNP in the LCT gene promoter, is associated with lactase ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "APOE \u03b54 is the strongest common genetic risk factor for late-onset Alz",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "A chromosomal translocation t(9;22) generates the BCR-ABL fusion oncog",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Copy number variations in the CNTN6 locus are associated with autism s",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The MYC super-enhancer drives high-level transcription of MYC in multi",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "H3K27ac marks active enhancers and super-enhancers associated with cel",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The TATA box is a core promoter element recognised by TBP within the p",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "DNA methylation at CpG islands in the CDKN2A promoter silences gene ex",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "AP-1 binding sites in the IL-6 promoter recruit FOSL1 to drive inflamm",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Topologically associating domains (TADs) compartmentalise the genome i",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Hi-C data revealed a TAD boundary at the CTCF-binding site upstream of",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Metformin activates AMPK by increasing the AMP:ATP ratio in hepatocyte",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Gefitinib binds the ATP-binding pocket of EGFR kinase with nanomolar a",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The SWI/SNF chromatin remodelling complex uses ATP hydrolysis to repos",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Dasatinib and quercetin act as senolytics eliminating p16-positive sen",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The HLA-B*57:01 haplotype predisposes carriers to abacavir hypersensit",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Individuals homozygous for the ApoE4 genotype have a 12-fold increased",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Alzheimer disease is characterised by amyloid-beta plaques and neurofi",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Triple-negative breast cancer lacks ER, PR, and HER2 expression and ha",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Patients with type 2 diabetes present with polyuria, polydipsia, and h",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Werner syndrome is a premature ageing disorder caused by loss-of-funct",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Hutchinson-Gilford progeria syndrome accelerates cardiovascular ageing",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The PI3K-AKT-mTOR pathway is hyperactivated in the majority of solid t",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Phosphorylation of I\u03baB\u03b1 by IKK\u03b2 triggers its ubiquitination and protea",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Autophagy degrades damaged organelles and misfolded proteins to mainta",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "ATP hydrolysis by the vacuolar ATPase drives proton translocation acro",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Wnt ligands bind Frizzled receptors to activate the beta-catenin destr",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The Notch signalling pathway regulates cell fate decisions during haem",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Mitochondria generate ATP via oxidative phosphorylation in their inner",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Lysosomes fuse with autophagosomes to form autolysosomes, completing t",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Dopaminergic neurons in the substantia nigra degenerate selectively in",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "CD8+ cytotoxic T lymphocytes infiltrate the tumour microenvironment an",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "HeLa cells were transfected with a plasmid encoding GFP-tagged BRCA1.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "MCF-7 breast adenocarcinoma cells are oestrogen receptor positive.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Adipose tissue secretes adipokines including leptin, adiponectin, and ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The hippocampus undergoes progressive atrophy in Alzheimer disease.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Pancreatic beta cells secrete insulin in response to elevated blood gl",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "NANOG and OCT4 are pluripotency factors expressed in embryonic stem ce",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "During gastrulation, WNT signalling patterns the embryonic mesoderm.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Foetal haematopoiesis initiates in the aorta-gonad-mesonephros region.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Caloric restriction by 30% extended median lifespan by 40% in C57BL/6 ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Mice subjected to a high-fat diet for 16 weeks developed insulin resis",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Intermittent fasting activated AMPK and reduced mTORC1 signalling in a",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "CTCF-mediated chromatin loops bring distal enhancers into proximity wi",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Hi-C analysis revealed A/B compartment switching in senescent fibrobla",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Drosophila melanogaster daf-2 mutants live twice as long as wild-type ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Saccharomyces cerevisiae has been used to study replicative ageing and",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Mus musculus knockout models carrying homozygous Trp53 deletions devel",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "In aged C57BL/6J mice fed a high-fat diet, rapamycin restored mTORC1-d",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "CRISPR-Cas9 deletion of the PTEN tumour suppressor in prostate epithel",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "ChIP-seq of H3K4me3 in human embryonic stem cells revealed bivalent do",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The APOE \u03b54 haplotype increases amyloid-beta accumulation and tau phos",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "lncRNA NEAT1 scaffolds paraspeckle formation and sequesters miR-193 to",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        }
+      ]
+    },
+    {
+      "model": "HunFlair2",
+      "overall": {
+        "exact_precision": 0.127,
+        "exact_recall": 0.077,
+        "exact_f1": 0.096,
+        "partial_precision": 0.93,
+        "partial_recall": 0.253,
+        "partial_f1": 0.398,
+        "tp_exact": 18,
+        "fp": 10,
+        "fn": 174
+      },
+      "tier1_only": {
+        "exact_precision": 0.13,
+        "exact_recall": 0.098,
+        "exact_f1": 0.112,
+        "partial_precision": 0.957,
+        "partial_recall": 0.322,
+        "partial_f1": 0.482,
+        "tp_exact": 18,
+        "fp": 6,
+        "fn": 124
+      },
+      "type_coverage_pct": 10.5,
+      "types_predicted": [
+        "CELLLINE",
+        "DISEASE",
+        "GENE",
+        "ORGANISM",
+        "SMALL_MOLECULE"
+      ],
+      "avg_latency_ms": 1188.6,
+      "p95_latency_ms": 1648.7,
+      "gpu_peak_mb": 884.5,
+      "per_type_partial_f1": {
+        "GENE": 0.956,
+        "SEQUENCE_VARIANT": 0,
+        "DEVELOPMENTAL_STAGE": 0,
+        "TRANSCRIPT": 0,
+        "BIOLOGICAL_PROCESS": 0,
+        "GENOMIC_VARIANT": 0,
+        "CELL_TYPE": 0,
+        "DISEASE": 0.985,
+        "CANCER": 0,
+        "EXON": 0,
+        "EPIGENOMIC_FEATURE": 0,
+        "PROTEIN": 0,
+        "MOLECULAR_INTERACTION": 0,
+        "PATHWAY": 0,
+        "SYMPTOM": 0,
+        "CELL_LINE": 0,
+        "ENHANCER": 0,
+        "GENOTYPE": 0,
+        "REACTION": 0,
+        "PHENOTYPE": 0,
+        "CELLULAR_COMPONENT": 0,
+        "ORGANISM": 0.911,
+        "EXPERIMENTAL_FACTOR": 0,
+        "PROMOTER": 0,
+        "SMALL_MOLECULE": 1.0,
+        "NON_CODING_RNA": 0,
+        "THREE_D_GENOME_STRUCTURE": 0,
+        "MACROMOLECULAR_COMPLEX": 0,
+        "ANATOMY": 0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0,
+        "TAD": 0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0,
+        "TISSUE": 0
+      },
+      "errors": []
+    },
+    {
+      "model": "BENT-PubMedBERT-Gene",
+      "overall": {
+        "exact_precision": 0.139,
+        "exact_recall": 0.047,
+        "exact_f1": 0.071,
+        "partial_precision": 0.911,
+        "partial_recall": 0.155,
+        "partial_f1": 0.264,
+        "tp_exact": 11,
+        "fp": 7,
+        "fn": 197
+      },
+      "tier1_only": {
+        "exact_precision": 0.139,
+        "exact_recall": 0.06,
+        "exact_f1": 0.084,
+        "partial_precision": 0.911,
+        "partial_recall": 0.197,
+        "partial_f1": 0.324,
+        "tp_exact": 11,
+        "fp": 7,
+        "fn": 147
+      },
+      "type_coverage_pct": 2.6,
+      "types_predicted": [
+        "PROTEIN"
+      ],
+      "avg_latency_ms": 17.6,
+      "p95_latency_ms": 42.6,
+      "gpu_peak_mb": 881.5,
+      "per_type_partial_f1": {
+        "GENE": 0,
+        "SEQUENCE_VARIANT": 0,
+        "DEVELOPMENTAL_STAGE": 0,
+        "TRANSCRIPT": 0,
+        "BIOLOGICAL_PROCESS": 0,
+        "GENOMIC_VARIANT": 0,
+        "CELL_TYPE": 0,
+        "DISEASE": 0,
+        "CANCER": 0,
+        "EXON": 0,
+        "EPIGENOMIC_FEATURE": 0,
+        "PROTEIN": 0.941,
+        "MOLECULAR_INTERACTION": 0,
+        "PATHWAY": 0,
+        "SYMPTOM": 0,
+        "CELL_LINE": 0,
+        "ENHANCER": 0,
+        "GENOTYPE": 0,
+        "REACTION": 0,
+        "PHENOTYPE": 0,
+        "CELLULAR_COMPONENT": 0,
+        "ORGANISM": 0,
+        "EXPERIMENTAL_FACTOR": 0,
+        "PROMOTER": 0,
+        "SMALL_MOLECULE": 0,
+        "NON_CODING_RNA": 0,
+        "THREE_D_GENOME_STRUCTURE": 0,
+        "MACROMOLECULAR_COMPLEX": 0,
+        "ANATOMY": 0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0,
+        "TAD": 0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0,
+        "TISSUE": 0
+      },
+      "errors": []
+    },
+    {
+      "model": "BENT-PubMedBERT-Disease",
+      "overall": {
+        "exact_precision": 0.0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0.98,
+        "partial_recall": 0.052,
+        "partial_f1": 0.098,
+        "tp_exact": 0,
+        "fp": 1,
+        "fn": 221
+      },
+      "tier1_only": {
+        "exact_precision": 0.0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0.98,
+        "partial_recall": 0.066,
+        "partial_f1": 0.123,
+        "tp_exact": 0,
+        "fp": 1,
+        "fn": 171
+      },
+      "type_coverage_pct": 2.6,
+      "types_predicted": [
+        "DISEASE"
+      ],
+      "avg_latency_ms": 39.5,
+      "p95_latency_ms": 119.6,
+      "gpu_peak_mb": 1318.2,
+      "per_type_partial_f1": {
+        "GENE": 0,
+        "SEQUENCE_VARIANT": 0,
+        "DEVELOPMENTAL_STAGE": 0,
+        "TRANSCRIPT": 0,
+        "BIOLOGICAL_PROCESS": 0,
+        "GENOMIC_VARIANT": 0,
+        "CELL_TYPE": 0,
+        "DISEASE": 0.99,
+        "CANCER": 0,
+        "EXON": 0,
+        "EPIGENOMIC_FEATURE": 0,
+        "PROTEIN": 0,
+        "MOLECULAR_INTERACTION": 0,
+        "PATHWAY": 0,
+        "SYMPTOM": 0,
+        "CELL_LINE": 0,
+        "ENHANCER": 0,
+        "GENOTYPE": 0,
+        "REACTION": 0,
+        "PHENOTYPE": 0,
+        "CELLULAR_COMPONENT": 0,
+        "ORGANISM": 0,
+        "EXPERIMENTAL_FACTOR": 0,
+        "PROMOTER": 0,
+        "SMALL_MOLECULE": 0,
+        "NON_CODING_RNA": 0,
+        "THREE_D_GENOME_STRUCTURE": 0,
+        "MACROMOLECULAR_COMPLEX": 0,
+        "ANATOMY": 0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0,
+        "TAD": 0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0,
+        "TISSUE": 0
+      },
+      "errors": []
+    },
+    {
+      "model": "PubMedBERT-ProteinStructure",
+      "overall": {
+        "exact_precision": 0.089,
+        "exact_recall": 0.06,
+        "exact_f1": 0.072,
+        "partial_precision": 0.93,
+        "partial_recall": 0.167,
+        "partial_f1": 0.284,
+        "tp_exact": 14,
+        "fp": 11,
+        "fn": 194
+      },
+      "tier1_only": {
+        "exact_precision": 0.089,
+        "exact_recall": 0.077,
+        "exact_f1": 0.082,
+        "partial_precision": 0.93,
+        "partial_recall": 0.213,
+        "partial_f1": 0.347,
+        "tp_exact": 14,
+        "fp": 11,
+        "fn": 144
+      },
+      "type_coverage_pct": 5.3,
+      "types_predicted": [
+        "MOLECULAR_FUNCTION",
+        "PROTEIN"
+      ],
+      "avg_latency_ms": 12.7,
+      "p95_latency_ms": 17.4,
+      "gpu_peak_mb": 1755.0,
+      "per_type_partial_f1": {
+        "GENE": 0,
+        "SEQUENCE_VARIANT": 0,
+        "DEVELOPMENTAL_STAGE": 0,
+        "TRANSCRIPT": 0,
+        "BIOLOGICAL_PROCESS": 0,
+        "GENOMIC_VARIANT": 0,
+        "CELL_TYPE": 0,
+        "DISEASE": 0,
+        "CANCER": 0,
+        "EXON": 0,
+        "EPIGENOMIC_FEATURE": 0,
+        "PROTEIN": 0.957,
+        "MOLECULAR_INTERACTION": 0,
+        "PATHWAY": 0,
+        "SYMPTOM": 0,
+        "CELL_LINE": 0,
+        "ENHANCER": 0,
+        "GENOTYPE": 0,
+        "REACTION": 0,
+        "PHENOTYPE": 0,
+        "CELLULAR_COMPONENT": 0,
+        "ORGANISM": 0,
+        "EXPERIMENTAL_FACTOR": 0,
+        "PROMOTER": 0,
+        "SMALL_MOLECULE": 0,
+        "NON_CODING_RNA": 0,
+        "THREE_D_GENOME_STRUCTURE": 0,
+        "MACROMOLECULAR_COMPLEX": 0,
+        "ANATOMY": 0,
+        "REGULATORY_REGION": 0,
+        "HAPLOTYPE": 0,
+        "MOTIF": 0,
+        "SUPER_ENHANCER": 0,
+        "STRUCTURAL_VARIANT": 0,
+        "MOLECULAR_FUNCTION": 0.667,
+        "TAD": 0,
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": 0,
+        "TISSUE": 0
+      },
+      "errors": []
+    }
+  ],
+  "ranking": [
+    {
+      "model": "GLiNER-BioMed-large",
+      "overall": {
+        "exact_precision": 0.14,
+        "exact_recall": 0.206,
+        "exact_f1": 0.166,
+        "partial_precision": 0.826,
+        "partial_recall": 0.931,
+        "partial_f1": 0.875,
+        "tp_exact": 48,
+        "fp": 60,
+        "fn": 16
+      },
+      "tier1_only": {
+        "exact_precision": 0.154,
+        "exact_recall": 0.213,
+        "exact_f1": 0.178,
+        "partial_precision": 0.902,
+        "partial_recall": 0.973,
+        "partial_f1": 0.936,
+        "tp_exact": 39,
+        "fp": 25,
+        "fn": 5
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0.235,
+          "exact_recall": 0.308,
+          "exact_f1": 0.267,
+          "partial_precision": 1.0,
+          "partial_recall": 0.962,
+          "partial_f1": 0.98,
+          "tp_exact": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0.111,
+          "exact_recall": 0.5,
+          "exact_f1": 0.182,
+          "partial_precision": 0.333,
+          "partial_recall": 1.0,
+          "partial_f1": 0.5,
+          "tp_exact": 1,
+          "fp": 6,
+          "fn": 0
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0.5,
+          "exact_recall": 0.333,
+          "exact_f1": 0.4,
+          "partial_precision": 0.5,
+          "partial_recall": 0.333,
+          "partial_f1": 0.4,
+          "tp_exact": 2,
+          "fp": 2,
+          "fn": 4
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.75,
+          "partial_recall": 1.0,
+          "partial_f1": 0.857,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0.111,
+          "exact_recall": 0.3,
+          "exact_f1": 0.162,
+          "partial_precision": 0.963,
+          "partial_recall": 1.0,
+          "partial_f1": 0.981,
+          "tp_exact": 3,
+          "fp": 1,
+          "fn": 0
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0.167,
+          "exact_recall": 0.25,
+          "exact_f1": 0.2,
+          "partial_precision": 0.667,
+          "partial_recall": 0.75,
+          "partial_f1": 0.706,
+          "tp_exact": 1,
+          "fp": 2,
+          "fn": 1
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0.077,
+          "exact_recall": 0.083,
+          "exact_f1": 0.08,
+          "partial_precision": 0.923,
+          "partial_recall": 1.0,
+          "partial_f1": 0.96,
+          "tp_exact": 1,
+          "fp": 1,
+          "fn": 0
+        },
+        "DISEASE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.929,
+          "partial_recall": 1.0,
+          "partial_f1": 0.963,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "CANCER": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "EXON": {
+          "exact_precision": 0.5,
+          "exact_recall": 0.5,
+          "exact_f1": 0.5,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0.167,
+          "exact_recall": 0.2,
+          "exact_f1": 0.182,
+          "partial_precision": 0.833,
+          "partial_recall": 0.8,
+          "partial_f1": 0.816,
+          "tp_exact": 1,
+          "fp": 1,
+          "fn": 1
+        },
+        "PROTEIN": {
+          "exact_precision": 0.194,
+          "exact_recall": 0.189,
+          "exact_f1": 0.192,
+          "partial_precision": 0.944,
+          "partial_recall": 0.973,
+          "partial_f1": 0.958,
+          "tp_exact": 7,
+          "fp": 2,
+          "fn": 1
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.312,
+          "partial_recall": 1.0,
+          "partial_f1": 0.476,
+          "tp_exact": 0,
+          "fp": 11,
+          "fn": 0
+        },
+        "PATHWAY": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "SYMPTOM": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "CELL_LINE": {
+          "exact_precision": 0.125,
+          "exact_recall": 0.333,
+          "exact_f1": 0.182,
+          "partial_precision": 0.75,
+          "partial_recall": 1.0,
+          "partial_f1": 0.857,
+          "tp_exact": 1,
+          "fp": 2,
+          "fn": 0
+        },
+        "ENHANCER": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.75,
+          "partial_recall": 1.0,
+          "partial_f1": 0.857,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "GENOTYPE": {
+          "exact_precision": 0.25,
+          "exact_recall": 1.0,
+          "exact_f1": 0.4,
+          "partial_precision": 0.5,
+          "partial_recall": 1.0,
+          "partial_f1": 0.667,
+          "tp_exact": 1,
+          "fp": 2,
+          "fn": 0
+        },
+        "REACTION": {
+          "exact_precision": 0.056,
+          "exact_recall": 0.333,
+          "exact_f1": 0.095,
+          "partial_precision": 0.611,
+          "partial_recall": 1.0,
+          "partial_f1": 0.759,
+          "tp_exact": 1,
+          "fp": 7,
+          "fn": 0
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.947,
+          "partial_recall": 1.0,
+          "partial_f1": 0.973,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0.1,
+          "exact_recall": 0.125,
+          "exact_f1": 0.111,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "ORGANISM": {
+          "exact_precision": 0.308,
+          "exact_recall": 0.4,
+          "exact_f1": 0.348,
+          "partial_precision": 0.923,
+          "partial_recall": 0.9,
+          "partial_f1": 0.911,
+          "tp_exact": 4,
+          "fp": 1,
+          "fn": 1
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0.25,
+          "exact_recall": 0.25,
+          "exact_f1": 0.25,
+          "partial_precision": 0.75,
+          "partial_recall": 1.0,
+          "partial_f1": 0.857,
+          "tp_exact": 1,
+          "fp": 1,
+          "fn": 0
+        },
+        "PROMOTER": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 1.0,
+          "partial_recall": 0.833,
+          "partial_f1": 0.909,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0.364,
+          "exact_recall": 0.308,
+          "exact_f1": 0.333,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 4,
+          "fp": 0,
+          "fn": 0
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0.714,
+          "exact_recall": 0.833,
+          "exact_f1": 0.769,
+          "partial_precision": 0.857,
+          "partial_recall": 0.833,
+          "partial_f1": 0.845,
+          "tp_exact": 5,
+          "fp": 1,
+          "fn": 1
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.333,
+          "partial_recall": 1.0,
+          "partial_f1": 0.5,
+          "tp_exact": 0,
+          "fp": 2,
+          "fn": 0
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0.111,
+          "exact_recall": 0.167,
+          "exact_f1": 0.133,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "ANATOMY": {
+          "exact_precision": 0.25,
+          "exact_recall": 0.2,
+          "exact_f1": 0.222,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 2,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.571,
+          "partial_recall": 1.0,
+          "partial_f1": 0.727,
+          "tp_exact": 0,
+          "fp": 3,
+          "fn": 0
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.6,
+          "partial_recall": 1.0,
+          "partial_f1": 0.75,
+          "tp_exact": 0,
+          "fp": 4,
+          "fn": 0
+        },
+        "TAD": {
+          "exact_precision": 0.667,
+          "exact_recall": 0.667,
+          "exact_f1": 0.667,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.667,
+          "partial_recall": 1.0,
+          "partial_f1": 0.8,
+          "tp_exact": 0,
+          "fp": 2,
+          "fn": 0
+        },
+        "TISSUE": {
+          "exact_precision": 0.2,
+          "exact_recall": 0.5,
+          "exact_f1": 0.286,
+          "partial_precision": 0.4,
+          "partial_recall": 1.0,
+          "partial_f1": 0.571,
+          "tp_exact": 1,
+          "fp": 3,
+          "fn": 0
+        }
+      },
+      "type_coverage_pct": 94.7,
+      "types_predicted": [
+        "ANATOMY",
+        "BIOLOGICAL_PROCESS",
+        "CANCER",
+        "CELLULAR_COMPONENT",
+        "CELL_LINE",
+        "CELL_TYPE",
+        "DEVELOPMENTAL_STAGE",
+        "DISEASE",
+        "ENHANCER",
+        "EPIGENOMIC_FEATURE",
+        "EXON",
+        "EXPERIMENTAL_FACTOR",
+        "GENE",
+        "GENOMIC_VARIANT",
+        "GENOTYPE",
+        "HAPLOTYPE",
+        "MACROMOLECULAR_COMPLEX",
+        "MOLECULAR_FUNCTION",
+        "MOLECULAR_INTERACTION",
+        "NON_CODING_RNA",
+        "ORGANISM",
+        "PATHWAY",
+        "PHENOTYPE",
+        "PROMOTER",
+        "PROTEIN",
+        "REACTION",
+        "REGULATORY_REGION",
+        "SEQUENCE_VARIANT",
+        "SMALL_MOLECULE",
+        "SUPER_ENHANCER",
+        "SYMPTOM",
+        "TAD",
+        "THREE_D_GENOME_STRUCTURE",
+        "TISSUE",
+        "TRANSCRIPT",
+        "TRANSCRIPTION_FACTOR_BINDING_SITE"
+      ],
+      "avg_latency_ms": 109.8,
+      "p95_latency_ms": 152.3,
+      "gpu_peak_mb": 3715.4,
+      "errors": [],
+      "n_sentences": 69,
+      "score": 0.8776
+    },
+    {
+      "model": "scispaCy Ensemble (baseline)",
+      "overall": {
+        "exact_precision": 0.096,
+        "exact_recall": 0.094,
+        "exact_f1": 0.095,
+        "partial_precision": 0.865,
+        "partial_recall": 0.571,
+        "partial_f1": 0.688,
+        "tp_exact": 22,
+        "fp": 31,
+        "fn": 100
+      },
+      "tier1_only": {
+        "exact_precision": 0.101,
+        "exact_recall": 0.12,
+        "exact_f1": 0.11,
+        "partial_precision": 0.913,
+        "partial_recall": 0.727,
+        "partial_f1": 0.809,
+        "tp_exact": 22,
+        "fp": 19,
+        "fn": 50
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0.182,
+          "exact_recall": 0.308,
+          "exact_f1": 0.229,
+          "partial_precision": 0.955,
+          "partial_recall": 0.962,
+          "partial_f1": 0.958,
+          "tp_exact": 8,
+          "fp": 2,
+          "fn": 1
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0.1,
+          "exact_recall": 0.083,
+          "exact_f1": 0.091,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "DISEASE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.971,
+          "partial_recall": 1.0,
+          "partial_f1": 0.985,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "CANCER": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 1.0,
+          "partial_recall": 0.857,
+          "partial_f1": 0.923,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "EXON": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "PROTEIN": {
+          "exact_precision": 0.125,
+          "exact_recall": 0.162,
+          "exact_f1": 0.141,
+          "partial_precision": 0.979,
+          "partial_recall": 0.973,
+          "partial_f1": 0.976,
+          "tp_exact": 6,
+          "fp": 1,
+          "fn": 1
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "PATHWAY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SYMPTOM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "CELL_LINE": {
+          "exact_precision": 0.167,
+          "exact_recall": 0.333,
+          "exact_f1": 0.222,
+          "partial_precision": 0.333,
+          "partial_recall": 1.0,
+          "partial_f1": 0.5,
+          "tp_exact": 1,
+          "fp": 4,
+          "fn": 0
+        },
+        "ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "GENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "REACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0.154,
+          "exact_recall": 0.25,
+          "exact_f1": 0.19,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "ORGANISM": {
+          "exact_precision": 0.1,
+          "exact_recall": 0.1,
+          "exact_f1": 0.1,
+          "partial_precision": 0.8,
+          "partial_recall": 1.0,
+          "partial_f1": 0.889,
+          "tp_exact": 1,
+          "fp": 2,
+          "fn": 0
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "PROMOTER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0.111,
+          "exact_recall": 0.154,
+          "exact_f1": 0.129,
+          "partial_precision": 0.833,
+          "partial_recall": 1.0,
+          "partial_f1": 0.909,
+          "tp_exact": 2,
+          "fp": 3,
+          "fn": 0
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.828,
+          "partial_recall": 1.0,
+          "partial_f1": 0.906,
+          "tp_exact": 0,
+          "fp": 5,
+          "fn": 0
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "ANATOMY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TAD": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "TISSUE": {
+          "exact_precision": 0.333,
+          "exact_recall": 0.5,
+          "exact_f1": 0.4,
+          "partial_precision": 0.667,
+          "partial_recall": 1.0,
+          "partial_f1": 0.8,
+          "tp_exact": 1,
+          "fp": 1,
+          "fn": 0
+        }
+      },
+      "type_coverage_pct": 28.9,
+      "types_predicted": [
+        "CANCER",
+        "CELL",
+        "CELLULAR_COMPONENT",
+        "CELL_LINE",
+        "CELL_TYPE",
+        "DISEASE",
+        "GENE",
+        "NON_CODING_RNA",
+        "ORGAN",
+        "ORGANISM",
+        "ORGANISM_SUBSTANCE",
+        "PROTEIN",
+        "SIMPLE_CHEMICAL",
+        "SMALL_MOLECULE",
+        "TISSUE"
+      ],
+      "avg_latency_ms": 34.3,
+      "p95_latency_ms": 65.5,
+      "gpu_peak_mb": 1754.0,
+      "errors": [],
+      "n_sentences": 69,
+      "score": 0.6751
+    },
+    {
+      "model": "PubMedBERT-ProteinStructure",
+      "overall": {
+        "exact_precision": 0.089,
+        "exact_recall": 0.06,
+        "exact_f1": 0.072,
+        "partial_precision": 0.93,
+        "partial_recall": 0.167,
+        "partial_f1": 0.284,
+        "tp_exact": 14,
+        "fp": 11,
+        "fn": 194
+      },
+      "tier1_only": {
+        "exact_precision": 0.089,
+        "exact_recall": 0.077,
+        "exact_f1": 0.082,
+        "partial_precision": 0.93,
+        "partial_recall": 0.213,
+        "partial_f1": 0.347,
+        "tp_exact": 14,
+        "fp": 11,
+        "fn": 144
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 26
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "DISEASE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "CANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "EXON": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "PROTEIN": {
+          "exact_precision": 0.091,
+          "exact_recall": 0.378,
+          "exact_f1": 0.147,
+          "partial_precision": 0.942,
+          "partial_recall": 0.973,
+          "partial_f1": 0.957,
+          "tp_exact": 14,
+          "fp": 9,
+          "fn": 1
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "PATHWAY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SYMPTOM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "CELL_LINE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "GENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "REACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "ORGANISM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "PROMOTER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 13
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "ANATOMY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.5,
+          "partial_recall": 1.0,
+          "partial_f1": 0.667,
+          "tp_exact": 0,
+          "fp": 2,
+          "fn": 0
+        },
+        "TAD": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "TISSUE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "type_coverage_pct": 5.3,
+      "types_predicted": [
+        "MOLECULAR_FUNCTION",
+        "PROTEIN"
+      ],
+      "avg_latency_ms": 12.7,
+      "p95_latency_ms": 17.4,
+      "gpu_peak_mb": 1755.0,
+      "errors": [],
+      "n_sentences": 69,
+      "score": 0.4231
+    },
+    {
+      "model": "BENT-PubMedBERT-Gene",
+      "overall": {
+        "exact_precision": 0.139,
+        "exact_recall": 0.047,
+        "exact_f1": 0.071,
+        "partial_precision": 0.911,
+        "partial_recall": 0.155,
+        "partial_f1": 0.264,
+        "tp_exact": 11,
+        "fp": 7,
+        "fn": 197
+      },
+      "tier1_only": {
+        "exact_precision": 0.139,
+        "exact_recall": 0.06,
+        "exact_f1": 0.084,
+        "partial_precision": 0.911,
+        "partial_recall": 0.197,
+        "partial_f1": 0.324,
+        "tp_exact": 11,
+        "fp": 7,
+        "fn": 147
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 26
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "DISEASE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "CANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "EXON": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "PROTEIN": {
+          "exact_precision": 0.139,
+          "exact_recall": 0.297,
+          "exact_f1": 0.19,
+          "partial_precision": 0.911,
+          "partial_recall": 0.973,
+          "partial_f1": 0.941,
+          "tp_exact": 11,
+          "fp": 7,
+          "fn": 1
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "PATHWAY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SYMPTOM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "CELL_LINE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "GENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "REACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "ORGANISM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "PROMOTER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 13
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "ANATOMY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TAD": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "TISSUE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "type_coverage_pct": 2.6,
+      "types_predicted": [
+        "PROTEIN"
+      ],
+      "avg_latency_ms": 17.6,
+      "p95_latency_ms": 42.6,
+      "gpu_peak_mb": 881.5,
+      "errors": [],
+      "n_sentences": 69,
+      "score": 0.4196
+    },
+    {
+      "model": "BENT-PubMedBERT-Disease",
+      "overall": {
+        "exact_precision": 0.0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0.98,
+        "partial_recall": 0.052,
+        "partial_f1": 0.098,
+        "tp_exact": 0,
+        "fp": 1,
+        "fn": 221
+      },
+      "tier1_only": {
+        "exact_precision": 0.0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0.98,
+        "partial_recall": 0.066,
+        "partial_f1": 0.123,
+        "tp_exact": 0,
+        "fp": 1,
+        "fn": 171
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 26
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "DISEASE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.98,
+          "partial_recall": 1.0,
+          "partial_f1": 0.99,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "CANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "EXON": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "PROTEIN": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 37
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "PATHWAY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SYMPTOM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "CELL_LINE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "GENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "REACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "ORGANISM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "PROMOTER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 13
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "ANATOMY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TAD": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "TISSUE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "type_coverage_pct": 2.6,
+      "types_predicted": [
+        "DISEASE"
+      ],
+      "avg_latency_ms": 39.5,
+      "p95_latency_ms": 119.6,
+      "gpu_peak_mb": 1318.2,
+      "errors": [],
+      "n_sentences": 69,
+      "score": 0.3282
+    },
+    {
+      "model": "HunFlair2",
+      "overall": {
+        "exact_precision": 0.127,
+        "exact_recall": 0.077,
+        "exact_f1": 0.096,
+        "partial_precision": 0.93,
+        "partial_recall": 0.253,
+        "partial_f1": 0.398,
+        "tp_exact": 18,
+        "fp": 10,
+        "fn": 174
+      },
+      "tier1_only": {
+        "exact_precision": 0.13,
+        "exact_recall": 0.098,
+        "exact_f1": 0.112,
+        "partial_precision": 0.957,
+        "partial_recall": 0.322,
+        "partial_f1": 0.482,
+        "tp_exact": 18,
+        "fp": 6,
+        "fn": 124
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0.15,
+          "exact_recall": 0.462,
+          "exact_f1": 0.226,
+          "partial_precision": 0.95,
+          "partial_recall": 0.962,
+          "partial_f1": 0.956,
+          "tp_exact": 12,
+          "fp": 4,
+          "fn": 1
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "DISEASE": {
+          "exact_precision": 0.0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0.971,
+          "partial_recall": 1.0,
+          "partial_f1": 0.985,
+          "tp_exact": 0,
+          "fp": 1,
+          "fn": 0
+        },
+        "CANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "EXON": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "PROTEIN": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 37
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "PATHWAY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SYMPTOM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "CELL_LINE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "GENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "REACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "ORGANISM": {
+          "exact_precision": 0.231,
+          "exact_recall": 0.3,
+          "exact_f1": 0.261,
+          "partial_precision": 0.923,
+          "partial_recall": 0.9,
+          "partial_f1": 0.911,
+          "tp_exact": 3,
+          "fp": 1,
+          "fn": 1
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "PROMOTER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0.273,
+          "exact_recall": 0.231,
+          "exact_f1": 0.25,
+          "partial_precision": 1.0,
+          "partial_recall": 1.0,
+          "partial_f1": 1.0,
+          "tp_exact": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "ANATOMY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TAD": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "TISSUE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "type_coverage_pct": 10.5,
+      "types_predicted": [
+        "CELLLINE",
+        "DISEASE",
+        "GENE",
+        "ORGANISM",
+        "SMALL_MOLECULE"
+      ],
+      "avg_latency_ms": 1188.6,
+      "p95_latency_ms": 1648.7,
+      "gpu_peak_mb": 884.5,
+      "errors": [],
+      "n_sentences": 69,
+      "score": 0.3094
+    },
+    {
+      "model": "GLiNER-BioMed-bi-large",
+      "overall": {
+        "exact_precision": 0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0,
+        "partial_recall": 0.0,
+        "partial_f1": 0,
+        "tp_exact": 0,
+        "fp": 0,
+        "fn": 233
+      },
+      "tier1_only": {
+        "exact_precision": 0,
+        "exact_recall": 0.0,
+        "exact_f1": 0,
+        "partial_precision": 0,
+        "partial_recall": 0.0,
+        "partial_f1": 0,
+        "tp_exact": 0,
+        "fp": 0,
+        "fn": 183
+      },
+      "per_type": {
+        "GENE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 26
+        },
+        "SEQUENCE_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "DEVELOPMENTAL_STAGE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "TRANSCRIPT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "BIOLOGICAL_PROCESS": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "GENOMIC_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "CELL_TYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "DISEASE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 12
+        },
+        "CANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "EXON": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "EPIGENOMIC_FEATURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "PROTEIN": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 37
+        },
+        "MOLECULAR_INTERACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "PATHWAY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SYMPTOM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "CELL_LINE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "GENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "REACTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "PHENOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "CELLULAR_COMPONENT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "ORGANISM": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "EXPERIMENTAL_FACTOR": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "PROMOTER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "SMALL_MOLECULE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 13
+        },
+        "NON_CODING_RNA": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "THREE_D_GENOME_STRUCTURE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "MACROMOLECULAR_COMPLEX": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "ANATOMY": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "REGULATORY_REGION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "HAPLOTYPE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOTIF": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "SUPER_ENHANCER": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "STRUCTURAL_VARIANT": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "MOLECULAR_FUNCTION": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TAD": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "TRANSCRIPTION_FACTOR_BINDING_SITE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "TISSUE": {
+          "exact_precision": 0,
+          "exact_recall": 0.0,
+          "exact_f1": 0,
+          "partial_precision": 0,
+          "partial_recall": 0.0,
+          "partial_f1": 0,
+          "tp_exact": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "type_coverage_pct": 0.0,
+      "types_predicted": [],
+      "avg_latency_ms": 61.7,
+      "p95_latency_ms": 74.8,
+      "gpu_peak_mb": 5956.0,
+      "errors": [
+        {
+          "sentence": "BRCA1 and BRCA2 mutations confer a high lifetime risk of breast and ov",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "TP53 is the most frequently mutated gene in human cancers, altered in ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "EGFR amplification drives oncogenic signalling in glioblastoma multifo",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "FOXO3 is associated with human longevity in multiple genome-wide assoc",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The daf-2 gene encodes the C. elegans insulin/IGF-1 receptor ortholog.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "mTOR complex 1 phosphorylates S6K1 and 4E-BP1 to promote cap-dependent",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The p53 tumour suppressor protein is stabilised by ATM-mediated phosph",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "SIRT1 deacetylates histone H3 at lysine 9 to silence heterochromatin.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Rapamycin inhibits mTORC1 by binding to the FKBP12-rapamycin complex.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The PRC2 complex trimethylates histone H3 at lysine 27 to repress gene",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Alternative splicing of BRAF exon 15 generates isoforms with distinct ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The EGFR transcript variant EGFRvIII lacks exons 2-7 and is constituti",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "miR-21 is upregulated in most human cancers and targets the tumour sup",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "lncRNA HOTAIR recruits PRC2 to silence HOXD genes during development.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "circRNA ciRS-7 acts as a sponge for miR-7, thereby modulating EGFR exp",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The V600E missense mutation in BRAF constitutively activates MAPK sign",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "rs4988235, a SNP in the LCT gene promoter, is associated with lactase ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "APOE \u03b54 is the strongest common genetic risk factor for late-onset Alz",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "A chromosomal translocation t(9;22) generates the BCR-ABL fusion oncog",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Copy number variations in the CNTN6 locus are associated with autism s",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The MYC super-enhancer drives high-level transcription of MYC in multi",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "H3K27ac marks active enhancers and super-enhancers associated with cel",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The TATA box is a core promoter element recognised by TBP within the p",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "DNA methylation at CpG islands in the CDKN2A promoter silences gene ex",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "AP-1 binding sites in the IL-6 promoter recruit FOSL1 to drive inflamm",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Topologically associating domains (TADs) compartmentalise the genome i",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Hi-C data revealed a TAD boundary at the CTCF-binding site upstream of",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Metformin activates AMPK by increasing the AMP:ATP ratio in hepatocyte",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Gefitinib binds the ATP-binding pocket of EGFR kinase with nanomolar a",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The SWI/SNF chromatin remodelling complex uses ATP hydrolysis to repos",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Dasatinib and quercetin act as senolytics eliminating p16-positive sen",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The HLA-B*57:01 haplotype predisposes carriers to abacavir hypersensit",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Individuals homozygous for the ApoE4 genotype have a 12-fold increased",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Alzheimer disease is characterised by amyloid-beta plaques and neurofi",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Triple-negative breast cancer lacks ER, PR, and HER2 expression and ha",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Patients with type 2 diabetes present with polyuria, polydipsia, and h",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Werner syndrome is a premature ageing disorder caused by loss-of-funct",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Hutchinson-Gilford progeria syndrome accelerates cardiovascular ageing",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The PI3K-AKT-mTOR pathway is hyperactivated in the majority of solid t",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Phosphorylation of I\u03baB\u03b1 by IKK\u03b2 triggers its ubiquitination and protea",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Autophagy degrades damaged organelles and misfolded proteins to mainta",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "ATP hydrolysis by the vacuolar ATPase drives proton translocation acro",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Wnt ligands bind Frizzled receptors to activate the beta-catenin destr",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The Notch signalling pathway regulates cell fate decisions during haem",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Mitochondria generate ATP via oxidative phosphorylation in their inner",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Lysosomes fuse with autophagosomes to form autolysosomes, completing t",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Dopaminergic neurons in the substantia nigra degenerate selectively in",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "CD8+ cytotoxic T lymphocytes infiltrate the tumour microenvironment an",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "HeLa cells were transfected with a plasmid encoding GFP-tagged BRCA1.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "MCF-7 breast adenocarcinoma cells are oestrogen receptor positive.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Adipose tissue secretes adipokines including leptin, adiponectin, and ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The hippocampus undergoes progressive atrophy in Alzheimer disease.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Pancreatic beta cells secrete insulin in response to elevated blood gl",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "NANOG and OCT4 are pluripotency factors expressed in embryonic stem ce",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "During gastrulation, WNT signalling patterns the embryonic mesoderm.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Foetal haematopoiesis initiates in the aorta-gonad-mesonephros region.",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Caloric restriction by 30% extended median lifespan by 40% in C57BL/6 ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Mice subjected to a high-fat diet for 16 weeks developed insulin resis",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Intermittent fasting activated AMPK and reduced mTORC1 signalling in a",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "CTCF-mediated chromatin loops bring distal enhancers into proximity wi",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Hi-C analysis revealed A/B compartment switching in senescent fibrobla",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Drosophila melanogaster daf-2 mutants live twice as long as wild-type ",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Saccharomyces cerevisiae has been used to study replicative ageing and",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "Mus musculus knockout models carrying homozygous Trp53 deletions devel",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "In aged C57BL/6J mice fed a high-fat diet, rapamycin restored mTORC1-d",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "CRISPR-Cas9 deletion of the PTEN tumour suppressor in prostate epithel",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "ChIP-seq of H3K4me3 in human embryonic stem cells revealed bivalent do",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "The APOE \u03b54 haplotype increases amyloid-beta accumulation and tau phos",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        },
+        {
+          "sentence": "lncRNA NEAT1 scaffolds paraspeckle formation and sequesters miR-193 to",
+          "error": "BertModel.forward() got an unexpected keyword argument 'token_lengths'"
+        }
+      ],
+      "n_sentences": 69,
+      "score": 0.1896
+    }
+  ],
+  "recommended_primary": "GLiNER-BioMed-large",
+  "recommended_architecture": "GLiNER-BioMed-large (primary) -> PubMedBERT specialists + HunFlair2 (layer B) -> PubTator3 (layer C)"
+}
