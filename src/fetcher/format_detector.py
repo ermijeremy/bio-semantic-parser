@@ -1,6 +1,6 @@
 class FormatDetector:
-    
-    SUPPORTED_FORMATS = ["json", "xml", "html", "pdf"]
+
+    SUPPORTED_FORMATS = ["json", "xml", "html", "pdf", "text"]
 
     def detect(self, content_type: str) -> str:
         content_type = content_type.lower()
@@ -13,5 +13,7 @@ class FormatDetector:
             return "html"
         elif "pdf" in content_type:
             return "pdf"
+        elif "plain" in content_type or "text" in content_type:
+            return "text"
         else:
             return "unknown"

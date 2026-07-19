@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="100" y1="0" x2="100" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#2dd4bf"/>
+      <stop offset="40%"  stop-color="#38bdf8"/>
+      <stop offset="75%"  stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top circle -->
+  <circle cx="100" cy="14" r="11" fill="url(#grad)"/>
+
+  <!-- Level 1 arms (small V) -->
+  <path d="M68 38 Q100 52 132 38" stroke="url(#grad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="66"  cy="37" r="8" fill="url(#grad)"/>
+  <circle cx="134" cy="37" r="8" fill="url(#grad)"/>
+
+  <!-- Level 2 arms (medium V) -->
+  <path d="M44 68 Q100 86 156 68" stroke="url(#grad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="42"  cy="67" r="8" fill="url(#grad)"/>
+  <circle cx="158" cy="67" r="8" fill="url(#grad)"/>
+
+  <!-- Level 3 arms (wide V) -->
+  <path d="M20 100 Q100 122 180 100" stroke="url(#grad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="18"  cy="100" r="9" fill="url(#grad)"/>
+  <circle cx="182" cy="100" r="9" fill="url(#grad)"/>
+
+  <!-- DNA helix strands -->
+  <!-- Left strand -->
+  <path d="M80 122 C72 140 80 155 72 170 C64 185 72 200 68 215 C66 222 70 230 76 235"
+        stroke="url(#grad)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <!-- Right strand -->
+  <path d="M120 122 C128 140 120 155 128 170 C136 185 128 200 132 215 C134 222 130 230 124 235"
+        stroke="url(#grad)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+
+  <!-- DNA rungs (top section - wider) -->
+  <line x1="80"  y1="128" x2="120" y2="128" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="78"  y1="137" x2="122" y2="137" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="77"  y1="146" x2="123" y2="146" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="77"  y1="155" x2="123" y2="155" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="78"  y1="164" x2="122" y2="164" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="80"  y1="173" x2="120" y2="173" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+
+  <!-- DNA rungs (bottom section - narrower) -->
+  <line x1="82"  y1="183" x2="118" y2="183" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="85"  y1="193" x2="115" y2="193" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="88"  y1="203" x2="112" y2="203" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="92"  y1="213" x2="108" y2="213" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <line x1="96"  y1="223" x2="104" y2="223" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+</svg>

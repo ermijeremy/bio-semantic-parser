@@ -1,2 +1,2 @@
-# Re-export from pydantic_model.py — the canonical file for Component 2.
+# Backward-compat re-export — import from src.schema.pydantic_model directly in new code.
 from .pydantic_model import BiologicalRelation, ExtractionResult  # noqa: F401

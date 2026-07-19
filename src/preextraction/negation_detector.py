@@ -8,6 +8,7 @@ Sentences are split at contrastive conjunctions ("but not", "however",
 "although"…) before classification so that entities in the positive branch
 of a contrastive sentence are not incorrectly flagged as negated.
 """
+import os
 import re
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -20,7 +21,6 @@ _CONTRASTIVE = re.compile(
     r'but(?!\s+not)|yet(?!\s+not))\b',
     re.IGNORECASE,
 )
-
 
 def _extract_entity_clause(sentence: str, entity_text: str) -> str:
     """Return the sub-clause containing entity_text, or the full sentence if no split point."""
@@ -46,12 +46,27 @@ _DEFAULT_HYPOTHESIS = (
 
 class NegationDetector:
     _MODEL     = "cross-encoder/nli-MiniLM2-L6-H768"
-    _THRESHOLD = 0.40  # contradiction score above this → ABSENT
+    try:
+        _THRESHOLD = float(os.getenv("NEGATION_THRESHOLD", "0.45"))
+    except ValueError:
+        _THRESHOLD = 0.45
+    # Calibrated against biomedical test sentences:
+    # 0.45 catches "no improvement" (0.89), "NOT recommended" (0.47),
+    # while correctly passing "contributes to" (0.03), "enables" (0.04).
 
     def __init__(self, hypothesis: str = _DEFAULT_HYPOTHESIS):
         self._hypothesis = hypothesis
-        self._tokenizer  = AutoTokenizer.from_pretrained(self._MODEL)
-        self._model      = AutoModelForSequenceClassification.from_pretrained(self._MODEL)
+        import os as _os
+        _os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+        self._tokenizer  = AutoTokenizer.from_pretrained(
+            self._MODEL, local_files_only=True
+        )
+        self._model      = AutoModelForSequenceClassification.from_pretrained(
+            self._MODEL,
+            local_files_only=True,
+            device_map=None,          # prevent accelerate meta tensor path
+            low_cpu_mem_usage=False,  # force eager allocation
+        )
         self._model.eval()
         # Label order: {0: contradiction, 1: entailment, 2: neutral}
     
@@ -66,7 +81,7 @@ class NegationDetector:
             probs = torch.softmax(self._model(**inputs).logits, dim=-1)[0]
         contradiction_score = float(probs[0])
         return contradiction_score > self._THRESHOLD, round(contradiction_score, 3)
-    
+
     def _find_sentence(self, doc, entity_text: str, start_char: int) -> str:
         if start_char >= 0:
             for sent in doc.sents:

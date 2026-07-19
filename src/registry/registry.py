@@ -1,8 +1,10 @@
 import yaml
 import os
 
+_DEFAULT_CONFIG = os.getenv("SOURCES_CONFIG", "config/sources.yaml")
+
 class SourceRegistry:
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: str = _DEFAULT_CONFIG):
         self.config_path = config_path
         self.sources = self._load()
 

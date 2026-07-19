@@ -3,7 +3,27 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-data/processed_ids.db
+data/
 *.egg-info/
 src/schema/taxonomy-backup.py
 src/schema/layer5_schema.svg
+
+# Optional modules — not for GitHub until next quarter
+optional_modules/
+src/pln/
+pln/
+tools/verify_kg.py
+tools/visualize_pln.py
+
+# Runtime outputs
+uvicorn.log
+verification_report.html
+verification_report.json
+eval_report.json
+*.DS_Store
+
+# SVG diagrams (generated)
+src/fetcher/layer3_fetcher.svg
+src/preextraction/layer4_preextraction.svg
+src/registry/layer1_registry.svg
+src/scheduler/layer2_scheduler.svg
