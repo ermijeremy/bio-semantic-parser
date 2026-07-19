@@ -475,7 +475,30 @@ def process(
     log(f"  → {connect} connect existing | {partial} one new node | {new_nodes} both new")
 
     log(f"Layer 7 complete — {len(records)} records ready for Layer 8")
-    # Attach text_by_doc to records so Layer 8 can verify against source
+
+    # Verdicts are assigned after dedup; backfill flagged_for_review so Layer 8 skips REJECT/REVIEW triples.
+    import os as _os_sync, sqlite3 as _sq_sync
+    _staging_path = _os_sync.getenv("TRIPLE_STORE_PATH", "")
+    if _staging_path:
+        try:
+            with _sq_sync.connect(_staging_path) as _sc:
+                for r in records:
+                    tid = r.get("triple_id")
+                    if not tid:
+                        continue
+                    verdict = r.get("validation_verdict", "")
+                    if verdict in ("REJECT", "REVIEW") or r.get("is_contradiction"):
+                        flagged = 1
+                    else:
+                        flagged = 1 if r.get("flagged_for_review") else 0
+                    reason = r.get("review_reason") or (r.get("validation_reasoning") or "")[:500]
+                    _sc.execute(
+                        "UPDATE triples SET flagged_for_review=?, review_reason=? WHERE id=?",
+                        (flagged, reason, tid)
+                    )
+        except Exception as exc:
+            log(f"Failed to sync review flags to staging DB at {_staging_path}: {exc}")
+
     for r in records:
         doc_id = r.get("document_id", "")
         r["_source_text"] = text_by_doc.get(doc_id, "")

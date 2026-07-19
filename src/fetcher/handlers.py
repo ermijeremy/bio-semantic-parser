@@ -1,3 +1,4 @@
+import re
 import json
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
@@ -29,29 +30,50 @@ class JSONHandler:
 
 
 class XMLHandler:
+    # Pure noise patterns: numeric/date tokens, short uppercase codes, DOI prefixes
+    _NOISE = re.compile(
+        r'^[\d\s\-\/\.\:\,\(\)\[\]]+$'
+        r'|^[A-Z0-9]{1,6}$'
+        r'|^10\.\d{4,}\/'
+    )
+
     def extract(self, content: str, text_field: str = None) -> str:
         root = ET.fromstring(content)
 
-        # if text_field specified try that first
+        # config override: caller knows exactly which field to use
         if text_field:
-            elements = root.iter(text_field)
-            texts = [el.text for el in elements if el.text]
-            if texts:
-                return " ".join(texts)
+            texts = [
+                "".join(el.itertext()).strip()
+                for el in root.iter(text_field)
+            ]
+            result = " ".join(t for t in texts if self._is_readable(t))
+            if result:
+                return result
 
-        # check if this is a PMC full paper
-        body = root.find(".//body")
-        if body is not None:
+        # PMC full paper: has a structured <body> with named sections
+        if root.find(".//body") is not None:
             return self._extract_pmc_sections(root)
 
-        # fallback extract all text
-        texts = []
-        for element in root.iter():
-            if element.text and element.text.strip():
-                texts.append(element.text.strip())
-            if element.tail and element.tail.strip():
-                texts.append(element.tail.strip())
-        return " ".join(texts)
+        # universal fallback: walk every text node, keep readable chunks
+        return self._collect_text(root)
+
+    def _collect_text(self, root) -> str:
+        chunks = []
+        for el in root.iter():
+            for raw in (el.text, el.tail):
+                if raw and raw.strip():
+                    chunk = raw.strip()
+                    if self._is_readable(chunk):
+                        chunks.append(chunk)
+        return " ".join(chunks)
+
+    def _is_readable(self, text: str) -> bool:
+        if len(text) < 3:
+            return False
+        if self._NOISE.match(text):
+            return False
+        # must contain at least one real word (3+ consecutive letters)
+        return bool(re.search(r'[a-zA-Z]{3,}', text))
 
     def _extract_pmc_sections(self, root) -> str:
         sections = []
@@ -91,6 +113,32 @@ class HTMLHandler:
 
         # otherwise extract all visible text
         return soup.get_text(separator=" ", strip=True)
+
+
+class TextHandler:
+    def extract(self, content: str, text_field: str = None) -> str:
+        lines = content.splitlines()
+
+        # if a field label is specified, return only lines that match it
+        if text_field:
+            matched = [
+                line.split(":", 1)[1].strip()
+                for line in lines
+                if line.lower().startswith(text_field.lower() + ":")
+            ]
+            if matched:
+                return " ".join(matched)
+
+        kept = []
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            # skip label-only lines with no value (e.g. "FTP download:")
+            if ":" in line and not line.split(":", 1)[1].strip():
+                continue
+            kept.append(line)
+        return " ".join(kept)
 
 
 class PDFHandler:

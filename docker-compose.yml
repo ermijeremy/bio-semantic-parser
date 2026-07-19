@@ -1,0 +1,53 @@
+networks:
+  bsp-network:
+    driver: bridge
+
+services:
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: rejuvebio/bio-semantic-parser-frontend:staging
+    container_name: bsp-frontend
+    restart: unless-stopped
+    ports:
+      - "8006:80"
+    volumes:
+      - ./frontend/static:/app/frontend/static
+    depends_on:
+      - api
+    networks:
+      - bsp-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rejuvebio/bio-semantic-parser-backend:staging
+    container_name: bsp-backend
+    restart: unless-stopped
+    expose:
+      - "8000"
+    env_file:
+      - .env.docker
+    volumes:
+      - ./api:/app/api
+      - ./frontend:/app/frontend
+      - ./src:/app/src
+      - ./tools:/app/tools
+      - ./tests:/app/tests
+      - ./optional_modules:/app/optional_modules
+      - ./data:/app/data
+      - ./config:/app/config
+      - ${HF_CACHE_DIR:-~/.cache/huggingface}:/root/.cache/huggingface
+    mem_limit: 8g
+    memswap_limit: 8g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/sources"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    networks:
+      - bsp-network

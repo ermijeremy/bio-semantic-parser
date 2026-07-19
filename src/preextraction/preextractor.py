@@ -30,26 +30,23 @@ GLiNER models load lazily via singleton registry on first predict.
 """
 from __future__ import annotations
 
+import os
+
 import spacy
 from spacy.tokens import Span
 
-from ner.base import Entity
+from src.preextraction.ner_models import (
+    Entity, SCISPACY_MAP,
+    get_gliner_large as _get_gliner_large,
+    get_gliner_base  as _get_gliner_base,
+    get_stanza       as _get_stanza,
+)
 
 from src.preextraction.ner_tagger import NERTagger
 from src.preextraction.negation_detector import NegationDetector
 from src.preextraction.doi_extractor import DOIExtractor
 from src.preextraction.accession_detector import AccessionDetector
 from src.preextraction.pubtator_client import fetch_pubtator_entities
-
-# scispaCy raw-label → schema-type map (single source of truth, shared with the
-# scispaCy ensemble model). Reached via the model module so it never drifts.
-from ner.models.scispacy_ensemble import SCISPACY_MAP
-
-# ── lazy model accessors ──────────────────────────────────────────────────────
-# Imported here so the ner registry can manage singleton + cache env-vars.
-from ner.models.gliner_biomed_large import get_model as _get_gliner_large
-from ner.models.gliner_biomed_base  import get_model as _get_gliner_base
-from ner.models.stanza_bionlp13cg   import get_model as _get_stanza
 
 
 # Schema types scispaCy is authoritative on these win over the zero-shot models
@@ -86,6 +83,19 @@ def _covered_by(start: int, end: int, covered: list[tuple[int, int]]) -> bool:
 def _overlaps_any(start: int, end: int, occupied: list[tuple[int, int]]) -> bool:
     """True if [start, end) overlaps ANY existing span."""
     return any(_char_overlaps(start, end, s, e) for s, e in occupied)
+
+
+def _load_model(env_key: str, default: str):
+    """Load a spaCy model named by env_key, falling back to default. Returns None if empty."""
+    name = os.getenv(env_key, default).strip()
+    if not name:
+        return None
+    try:
+        return spacy.load(name)
+    except OSError:
+        import sys
+        print(f"[NER] Warning: model '{name}' ({env_key}) not found — skipping.", file=sys.stderr)
+        return None
 
 
 class Preextractor:
@@ -188,9 +198,9 @@ class Preextractor:
     # ── public API ────────────────────────────────────────────────────────────
 
     def process(self, chunk: dict) -> dict:
-        text     = chunk["text"]
-        doc      = self._run_ensemble(text)
-        entities = NERTagger.from_doc(doc)
+        text        = chunk["text"]
+        doc         = self._run_ensemble(text)
+        entities    = NERTagger.from_doc(doc)
 
         doc_id      = chunk.get("document_id", "")
         source_name = chunk.get("source_name", "")
@@ -220,11 +230,35 @@ class Preextractor:
         }
 
     def process_batch(self, chunks: list) -> list:
-        return [self.process(chunk) for chunk in chunks]
+        import concurrent.futures as _cf
+        try:
+            workers_env = int(os.getenv("NER_CHUNK_CONCURRENCY", "4"))
+        except ValueError:
+            workers_env = 4
+        workers = min(workers_env, len(chunks))
+        if workers <= 1 or len(chunks) <= 1:
+            return [self.process(chunk) for chunk in chunks]
+        with _cf.ThreadPoolExecutor(max_workers=workers) as pool:
+            return list(pool.map(self.process, chunks))
 
 
-def _merge_entities(ensemble: list, pubtator: list) -> list:
-    """PubTator3 entities (with normalization IDs) take priority; ensemble fills gaps."""
-    pt_normalized = {e["normalized"] for e in pubtator}
-    gap_fillers   = [e for e in ensemble if e["normalized"] not in pt_normalized]
-    return pubtator + gap_fillers
+def _merge_entities(ensemble: list, extra: list) -> list:
+    """Merge entity lists by surface text. If extra has richer normalization (e.g. PubTator identifier), update the existing entry."""
+    merged = []
+    by_key = {}
+    for e in ensemble:
+        key = (e.get("text") or "").lower()
+        if not key or key in by_key:
+            continue
+        by_key[key] = e.copy()
+        merged.append(by_key[key])
+    for e in extra:
+        key = (e.get("text") or "").lower()
+        if not key:
+            continue
+        if key not in by_key:
+            by_key[key] = e.copy()
+            merged.append(by_key[key])
+        elif "identifier" in e or e.get("source") == "pubtator3":
+            by_key[key].update(e)
+    return merged

@@ -8,20 +8,17 @@ _TIMEOUT  = 8
 _NCBI_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 _OLS_BASE  = "https://www.ebi.ac.uk/ols4/api"
 
+# OLS4 in-process cache — avoids redundant API calls for repeated terms.
+_ols4_cache: dict = {}
 
-# ── Biolink → OLS4 ontology filter ──────────────────────────────────────────
-# Derived from Biolink model id_prefixes. New entity types require no code changes
-# as long as they're in OLS4 (200+ ontologies).
+
+# ── Biolink → OLS4 ontology filter (gene/variant databases handled separately) ─
 _TYPE_TO_ONTOLOGIES: dict = {
-    # ncbigene/ensembl/uniprot are databases not OLS4 ontologies — handled by
-    # dedicated steps (_ensembl_search, _uniprot_search) in the normalization chain.
-    # Ensembl is the canonical gene ID per BioCypher alignment (team decision 2026-06-23).
     "GENE":                        ["ensembl", "hgnc"],
     "PROTEIN":                     ["pr", "hgnc"],
     "TRANSCRIPT":                  ["so"],
     "EXON":                        ["so"],
     "NON_CODING_RNA":              ["so"],
-    # dbsnp/clinvar/dbvar are databases not in OLS4 — SO covers sequence features
     "GENOMIC_VARIANT":             ["so"],
     "SEQUENCE_VARIANT":            ["so"],
     "STRUCTURAL_VARIANT":          ["so"],
@@ -36,12 +33,10 @@ _TYPE_TO_ONTOLOGIES: dict = {
     "MOTIF":                       ["so"],
     "TAD":                         ["so"],
     "SMALL_MOLECULE":              ["chebi", "mesh"],
-    # omim is a database not in OLS4 — MONDO cross-references OMIM IDs internally
     "DISEASE":                     ["mondo", "mesh", "doid"],
     "CANCER":                      ["mondo", "ncit", "mesh"],
     "PHENOTYPE":                   ["hp", "mp", "mesh"],
     "SYMPTOM":                     ["hp", "mesh"],
-    # reactome/kegg/rhea are databases not in OLS4 — PW (Pathway Ontology) + GO used instead
     "PATHWAY":                     ["pw", "go"],
     "REACTION":                    ["go"],
     "BIOLOGICAL_PROCESS":          ["go"],
@@ -76,6 +71,65 @@ def _slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", text.lower().strip()).strip("_")
 
 
+# ── Generic name pre-cleaning ────────────────────────────────────────────────
+
+def _clean_name(text: str) -> str:
+    """Strip PDF extraction artifacts (ligatures, soft hyphens, citations) before any lookup."""
+    text = text.replace("ﬁ", "fi").replace("ﬂ", "fl").replace("ﬀ", "ff") \
+               .replace("ﬃ", "ffi").replace("ﬄ", "ffl").replace("ﬅ", "st")
+    text = text.replace("­", "").replace("​", "").replace("﻿", "")
+    # "pro- tein" → "protein"
+    text = re.sub(r"-\s+", "", text)
+    # "cholesterol biosynthesis.35" → "cholesterol biosynthesis"
+    text = re.sub(r"\s*\.\d+(\s*,\s*\d+)*\s*$", "", text)
+    # "NFY family [12]" → "NFY family"
+    text = re.sub(r"\s*\[\d+\]\s*$", "", text)
+    text = re.sub(r"\s{2,}", " ", text).strip()
+    # "human human APOE" → "human APOE"
+    words = text.split()
+    dedup = [words[0]] + [w for i, w in enumerate(words[1:], 1) if w.lower() != words[i-1].lower()]
+    return " ".join(dedup)
+
+
+def _extract_embedded_ids(text: str) -> list:
+    """Return canonical IDs embedded in a name (rsID, Ensembl, UniProt, OBO) using format patterns only."""
+    found = []
+    # dbSNP rsID: exactly rs + 4-12 digits (NCBI dbSNP format)
+    for m in re.finditer(r"\brs\d{4,12}\b", text, re.I):
+        found.append((m.group().lower(), "dbsnp"))
+    # Ensembl stable gene ID (ENSG + 11 digits)
+    for m in re.finditer(r"\bENSG\d{11}\b", text):
+        found.append((f"ENSEMBL:{m.group()}", "ensembl"))
+    # UniProt accession (6 or 10 chars): covers P12345, Q9Y2T1, A0A024RBG1, etc.
+    for m in re.finditer(r"\b(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]{5}|[A-NR-Z][0-9][A-Z0-9]{8}[0-9])\b", text):
+        found.append((f"UniProtKB:{m.group()}", "uniprot"))
+    # OBO-style prefixed ID already embedded: e.g. "gene GO:0006914 expression"
+    for m in re.finditer(r"\b([A-Z]{2,10}:[A-Z0-9_]{3,15})\b", text):
+        if _is_canonical_id(m.group()):
+            found.append((m.group(), "embedded_obo"))
+    return found
+
+
+def _try_core_term(text: str, entity_type: str) -> Optional[str]:
+    """Resolve composite names by trying progressively shorter prefixes via OLS4/Ensembl."""
+    words = text.strip().split()
+    if len(words) < 2:
+        return None
+    ontologies = _TYPE_TO_ONTOLOGIES.get(entity_type, [])
+    for n_words in range(len(words) - 1, 0, -1):
+        core = " ".join(words[:n_words]).strip()
+        if len(core) < 2:
+            break
+        candidate = _ols4_search(core, ontologies) or _ols4_search(core, [])
+        if candidate:
+            return candidate
+        if entity_type in ("GENE", "PROTEIN", "TRANSCRIPT", "NON_CODING_RNA", ""):
+            eid = _ensembl_search(core)
+            if eid:
+                return eid
+    return None
+
+
 def _is_canonical_id(s: str) -> bool:
     """True if s looks like a real canonical ID (has a DB prefix or is an rsID)."""
     if not s:
@@ -93,6 +147,16 @@ def _is_canonical_id(s: str) -> bool:
 
 def _ols4_search(text: str, ontologies: list, timeout: int = _TIMEOUT) -> Optional[str]:
     """Search EBI OLS4, optionally scoped to specific ontologies; returns best-match ID (e.g. MESH:D031845)."""
+    cache_key = (text.lower().strip(), tuple(sorted(ontologies)))
+    if cache_key in _ols4_cache:
+        return _ols4_cache[cache_key]
+    result = _ols4_search_uncached(text, ontologies, timeout)
+    _ols4_cache[cache_key] = result
+    return result
+
+
+def _ols4_search_uncached(text: str, ontologies: list, timeout: int = _TIMEOUT) -> Optional[str]:
+    """Actual OLS4 HTTP call — called only on cache miss."""
     try:
         params: dict = {
             "q":     text,
@@ -294,6 +358,24 @@ def normalize_entity(
     if existing_id and _is_canonical_id(existing_id):
         return {"canonical_id": existing_id, "id_source": "pubtator3", "needs_review": False}
 
+    # ── Pre-clean: strip PDF artifacts before any lookup ─────────────────────
+    text = _clean_name(text)
+    if not text:
+        return {"canonical_id": "NEEDS_REVIEW", "id_source": "review", "needs_review": True}
+
+    # ── Pattern extraction: canonical IDs embedded in composite names ─────────
+    embedded = _extract_embedded_ids(text)
+    if embedded:
+        canon_id, source = embedded[0]
+        return {"canonical_id": canon_id, "id_source": source, "needs_review": False}
+
+    # ── Infer entity type from name structure when LLM type is unreliable ─────
+    if re.match(r"^rs\d{4,}$", text.strip(), re.I):
+        # rsIDs are always dbSNP regardless of declared entity_type
+        return {"canonical_id": text.strip().lower(), "id_source": "dbsnp", "needs_review": False}
+    if re.match(r"^ENSG\d{10,}$", text.strip()):
+        return {"canonical_id": f"ENSEMBL:{text.strip()}", "id_source": "ensembl", "needs_review": False}
+
     # ── Priority 2: Fast local lookup for common organisms ───────────────────
     if entity_type == "ORGANISM":
         lower = text.lower().strip()
@@ -301,9 +383,7 @@ def normalize_entity(
             return {"canonical_id": f"NCBITaxon:{_TAXON_LOCAL[lower]}",
                     "id_source": "ncbi_taxon", "needs_review": False}
 
-    # ── Priority 3: Ensembl — canonical gene IDs (BioCypher alignment) ─────────
-    # Checked before OLS4 so genes resolve to ENSG IDs, not HGNC IDs.
-    # Team decision 2026-06-23: use Ensembl by default to align with BioCypher.
+    # ── Priority 3: Ensembl — checked before OLS4 so genes get ENSG not HGNC ───
     if entity_type in ("GENE", "TRANSCRIPT", "EXON", "NON_CODING_RNA"):
         eid = _ensembl_search(text)
         if eid:
@@ -315,25 +395,19 @@ def normalize_entity(
     if ols_id:
         return {"canonical_id": ols_id, "id_source": "ols4", "needs_review": False}
 
-    # ── Priority 5: UniProt — canonical protein accessions (P12345) ─────────
-    # Resolves protein names, isoforms, and gene-product mappings.
-    # Added because OLS4 misses many protein isoforms and synonyms.
+    # ── Priority 5: UniProt — OLS4 misses many protein isoforms and synonyms ───
     if entity_type == "PROTEIN":
         uid = _uniprot_search(text)
         if uid:
             return {"canonical_id": uid, "id_source": "uniprot", "needs_review": False}
 
-    # ── Priority 6: RxNorm — drug names AND brand names → RxCUI ──────────────
-    # Added because OLS4/ChEBI miss brand names like "Rapamune" or "Glucophage".
-    # RxNorm covers both generic and commercial drug names (US NLM, free).
+    # ── Priority 6: RxNorm — covers brand names OLS4/ChEBI miss (e.g. Rapamune) ─
     if entity_type == "SMALL_MOLECULE":
         rxid = _rxnorm_search(text)
         if rxid:
             return {"canonical_id": rxid, "id_source": "rxnorm", "needs_review": False}
 
-    # ── Priority 7: HMDB — human metabolites ─────────────────────────────────
-    # Added because OLS4 ChEBI search misses many metabolite synonyms.
-    # HMDB covers lipids, amino acids, and other small molecules with rich synonyms.
+    # ── Priority 7: HMDB — metabolite synonyms OLS4 ChEBI search misses ────────
     if entity_type == "SMALL_MOLECULE":
         hid = _hmdb_search(text)
         if hid:
@@ -346,9 +420,6 @@ def normalize_entity(
             return {"canonical_id": gid, "id_source": "ncbi_gene", "needs_review": False}
 
     if entity_type in ("GENOMIC_VARIANT", "SEQUENCE_VARIANT", "HAPLOTYPE"):
-        m = re.match(r"^rs\d+$", text.strip(), re.I)
-        if m:
-            return {"canonical_id": text.strip().lower(), "id_source": "dbsnp", "needs_review": False}
         snp = _ncbi_search(text, "snp", "rs")
         if snp:
             return {"canonical_id": snp, "id_source": "dbsnp", "needs_review": False}
@@ -363,23 +434,32 @@ def normalize_entity(
         if pub:
             return {"canonical_id": pub, "id_source": "pubchem", "needs_review": False}
 
-    # ── Priority 9: OLS4 without ontology filter (broader search) ────────────
-    if ontologies:
-        ols_broad = _ols4_search(text, [])
-        if ols_broad:
-            return {"canonical_id": ols_broad, "id_source": "ols4_broad", "needs_review": False}
+    # ── Priority 9: OLS4 without ontology filter — always, not just typed ────
+    ols_broad = _ols4_search(text, [])
+    if ols_broad:
+        return {"canonical_id": ols_broad, "id_source": "ols4_broad", "needs_review": False}
 
-    # ── Priority 10: Wikidata — broad fallback covering anything not in above ──
+    # ── Priority 10: Composite decomposition — "PICALM loci" → PICALM ──────────
+    core_id = _try_core_term(text, entity_type)
+    if core_id:
+        return {"canonical_id": core_id, "id_source": "ols4_core", "needs_review": False}
+
+    # ── Priority 11: Wikidata — broad fallback covering anything not in above ──
     wd = _wikidata_search(text, entity_type)
     if wd:
         return {"canonical_id": wd, "id_source": "wikidata", "needs_review": False}
 
-    # ── Priority 11: TEXT:slug — consistent fallback, never bare text ─────────
+    # ── Priority 12: TEXT:slug — consistent fallback, never bare text ─────────
     slug = _slug(text)
     if slug:
         return {"canonical_id": f"TEXT:{slug}", "id_source": "fuzzy", "needs_review": True}
 
     return {"canonical_id": "NEEDS_REVIEW", "id_source": "review", "needs_review": True}
+
+
+def normalize_batch(records: list, chunk: dict) -> list:
+    """Normalize a list of records against a single chunk."""
+    return [normalize_record(r, chunk) for r in records]
 
 
 def normalize_record(record: dict, annotated_chunk: dict) -> dict:

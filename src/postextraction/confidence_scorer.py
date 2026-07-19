@@ -107,8 +107,9 @@ def _best_sentence(text: str, subj_key: str, obj_key: str,
     # This handles abbreviation mismatches: "blood pressure" in text vs "BP" in KG —
     # the best sentence might be in with_one if the object appears in expanded form.
     # NLI picks the sentence that best entails the relation regardless of key match.
-    # Cap at 10 candidates (not 5) since longer papers need wider search.
-    pool = (with_both + with_one)[:10]
+    # Cap at 5 candidates — beyond this NLI ranking gives diminishing returns
+    # and becomes the dominant cost for full-text papers (90+ relations).
+    pool = (with_both + with_one)[:5]
     best_sent, best_score = pool[0], -1.0
     for sent in pool:
         _, ent, _ = _nli_score(sent[:512], relation_hypothesis)

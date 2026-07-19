@@ -65,7 +65,7 @@ def append(records: list, run_dir: Path = None, target_format: str = "both") -> 
             jf.write(json.dumps(entry) + "\n")
             count += 1
 
-    _write_csv(records, csv_path)
+    _write_csv([{**r, "target_format": target_format} for r in records], csv_path)
     return count
 
 
@@ -170,7 +170,8 @@ def approve_records(approved: list, staging_db: str, queue_path: Path = None) ->
             flagged_for_review INTEGER NOT NULL DEFAULT 0,
             validation_verdict TEXT NOT NULL DEFAULT '',
             created_at         TEXT NOT NULL DEFAULT '',
-            updated_at         TEXT NOT NULL DEFAULT ''
+            updated_at         TEXT NOT NULL DEFAULT '',
+            UNIQUE(subject_id, relation, object_id, negated)
         )
     """)
 
@@ -178,6 +179,11 @@ def approve_records(approved: list, staging_db: str, queue_path: Path = None) ->
     now = _now()
     for r in approved:
         try:
+            # Remove old flagged triple — relation may have been corrected by reviewer
+            conn.execute(
+                "DELETE FROM triples WHERE subject_name=? AND relation=? AND object_name=? AND flagged_for_review=1",
+                (r.get("subject_name",""), r.get("relation",""), r.get("object_name",""))
+            )
             conn.execute("""
                 INSERT OR REPLACE INTO triples
                 (subject_id, subject_name, subject_type, relation,

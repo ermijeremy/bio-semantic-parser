@@ -41,6 +41,11 @@ _RETRY_BUDGET     = int(os.getenv("LLM_RETRY_BUDGET",     "5"))
 # Stagger completions to prevent burst arrivals that trigger vLLM scheduler freeze.
 _COMPLETION_DELAY = float(os.getenv("LLM_COMPLETION_DELAY", "2"))
 
+# Global rate limiter: minimum gap between HTTP submissions — prevents burst re-submissions that cause Running:0 Waiting:N freeze.
+_submit_lock      = threading.Lock()
+_last_submit_at   = [0.0]
+_SUBMIT_INTERVAL  = float(os.getenv("LLM_SUBMIT_INTERVAL", "2.0"))
+
 
 def call_llm(
     messages:     list,
@@ -75,6 +80,13 @@ def call_llm(
 
         # Single throttle point for all users/layers.
         _global_sem.acquire()
+        # Enforce minimum gap between submissions to prevent burst that triggers the vLLM scheduler freeze.
+        with _submit_lock:
+            import time as _t
+            gap = _SUBMIT_INTERVAL - (_t.time() - _last_submit_at[0])
+            if gap > 0:
+                _t.sleep(gap)
+            _last_submit_at[0] = _t.time()
         pool   = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         future = pool.submit(_call)
         try:

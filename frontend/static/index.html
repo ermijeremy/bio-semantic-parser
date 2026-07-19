@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bio Semantic Parser</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    body { font-family: var(--font-sans); }
+    code, pre, .mono { font-family: var(--font-mono); }
+  </style>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/query/query.css">
+  <link rel="stylesheet" href="/static/query/query-builder.css">
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <img src="/static/logo.svg" width="36" height="42" alt="Bio Semantic Parser Logo" style="flex-shrink:0;display:block"/>
+  <span class="logo">Bio Semantic Parser</span>
+  <div class="header-right">
+    <!-- Quick source chips in header -->
+    <div id="header-sources" style="display:flex;align-items:center;gap:6px"></div>
+    <button class="sources-btn" onclick="openSources()">Sources</button>
+    <button class="sources-btn" id="test-btn" onclick="startTest()" style="color:var(--text3)">Test</button>
+    <div class="status-badge">
+      <div class="dot" id="dot"></div>
+      <span id="status-txt">Ready</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page tabs ── -->
+<div style="border-bottom:1px solid var(--border,#30363d);background:var(--bg,#0d1117);position:sticky;top:0;z-index:50">
+  <div style="max-width:900px;margin:0 auto;padding:0 20px;display:flex;gap:0">
+    <button id="tab-pipeline" onclick="switchTab('pipeline')" style="
+      padding:12px 20px;background:none;border:none;border-bottom:2px solid var(--blue,#1f6feb);
+      color:var(--text1,#e6edf3);font-size:13px;font-weight:600;cursor:pointer;
+      transition:all .15s;white-space:nowrap
+    ">⚗️ Pipeline</button>
+    <button id="tab-query" onclick="switchTab('query')" style="
+      padding:12px 20px;background:none;border:none;border-bottom:2px solid transparent;
+      color:var(--text3,#6e7681);font-size:13px;font-weight:600;cursor:pointer;
+      transition:all .15s;white-space:nowrap
+    ">🔍 Query KG</button>
+    <button id="tab-unified" onclick="switchTab('unified')" style="
+      padding:12px 20px;background:none;border:none;border-bottom:2px solid transparent;
+      color:var(--text3,#6e7681);font-size:13px;font-weight:600;cursor:pointer;
+      transition:all .15s;white-space:nowrap
+    ">🌐 Unified KG</button>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  ['pipeline','query','unified'].forEach(t => {
+    const display = tab === t ? (t === 'unified' ? 'flex' : '') : 'none';
+    document.getElementById('page-'+t).style.display = display;
+    const btn = document.getElementById('tab-'+t);
+    btn.style.borderBottomColor = tab === t ? 'var(--blue,#1f6feb)' : 'transparent';
+    btn.style.color             = tab === t ? 'var(--text1,#e6edf3)' : 'var(--text3,#6e7681)';
+  });
+  if (tab === 'query') {
+    const canvas = document.getElementById('qb-canvas');
+    if (canvas && !canvas.dataset.init) { canvas.dataset.init = '1'; if (window.initQueryBuilder) initQueryBuilder(); }
+  }
+  if (tab === 'unified') loadUnifiedKG();
+}
+
+async function loadUnifiedKG(fmt) {
+  const sel = document.getElementById('unified-db-sel');
+  if (!fmt) fmt = sel ? sel.value : 'neo4j';
+  // Sync selector to match
+  if (sel && sel.value !== fmt) sel.value = fmt;
+  const frame = document.getElementById('unified-frame');
+  if (!frame) return;
+
+  // Find most recent compare_{fmt}.html across all run folders
+  try {
+    const r = await fetch(`/api/query/latest-compare?fmt=${fmt}`);
+    const d = await r.json();
+    if (d.path) {
+      frame.src = '/api/file?path=' + encodeURIComponent(d.path);
+      return;
+    }
+  } catch(e) {}
+
+  // Fallback to unified graph.html
+  const fallback = { neo4j: 'data/kg_output/unified_neo4j/graph.html', metta: 'data/kg_output/unified_metta/graph.html' };
+  frame.src = '/api/file?path=' + encodeURIComponent(fallback[fmt]);
+}
+</script>
+
+<!-- ── Main ── -->
+<div id="page-pipeline">
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="8" fill="#1a0f2e"/>
+        <circle cx="9"  cy="7"  r="3" fill="#a855f7"/>
+        <circle cx="23" cy="12" r="3" fill="#00c9b1"/>
+        <circle cx="9"  cy="20" r="3" fill="#a855f7"/>
+        <circle cx="23" cy="25" r="3" fill="#00c9b1"/>
+        <line x1="9" y1="7"   x2="23" y2="12" stroke="#a855f7" stroke-width="1.5" stroke-opacity=".6"/>
+        <line x1="23" y1="12" x2="9"  y2="20" stroke="#00c9b1" stroke-width="1.5" stroke-opacity=".6"/>
+        <line x1="9" y1="20"  x2="23" y2="25" stroke="#a855f7" stroke-width="1.5" stroke-opacity=".6"/>
+      </svg>
+      <div>
+        <div class="hero-title" style="margin-bottom:0">Bio-Semantic Parser</div>
+        <div class="hero-sub" style="margin-bottom:0">Scientific literature → structured knowledge graph</div>
+      </div>
+    </div>
+
+    <div class="input-box">
+      <!-- Smart input -->
+      <div class="smart-row">
+        <input id="smart-input" class="smart-input"
+          placeholder="e.g.  PMC6746067   or   25062748   or   10.1016/j.cell.2023.01.001   or   https://..."
+          oninput="detectInput(this.value)"
+          onkeydown="if(event.key==='Enter')startRun()" />
+        <span class="detect-badge" id="detect-badge">Auto-detect</span>
+      </div>
+
+      <!-- PDF upload (hidden until detected/clicked) -->
+      <div id="pdf-row" style="display:none;margin-top:12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="drop-zone" class="upload-link" style="flex:1"
+            onclick="document.getElementById('pdf-input').click()"
+            ondragover="event.preventDefault();this.style.color='var(--blue)'"
+            ondragleave="this.style.color=''"
+            ondrop="onDrop(event)">
+            <span id="pdf-name">Click to choose PDF or drag & drop</span>
+          </div>
+          <button id="pdf-clear" onclick="clearPdf()" style="display:none;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:5px" title="Remove PDF">✕</button>
+        </div>
+        <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="onFileSelect(this)">
+      </div>
+
+      <div class="input-divider"></div>
+
+      <div class="input-bottom">
+        <button class="sources-btn" id="pdf-toggle-link" onclick="togglePdfMode()">Upload PDF</button>
+        <div class="fmt-group">
+          <button class="fmt-chip" onclick="setFmt('neo4j',this)">Neo4j</button>
+          <button class="fmt-chip" onclick="setFmt('metta',this)">MeTTa</button>
+          <button class="fmt-chip active" onclick="setFmt('both',this)">Both</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
+        <button class="run-btn" id="run-btn" onclick="startRun()" style="width:auto;margin-top:0">Run Pipeline</button>
+        <button id="stop-btn-main" class="stop-btn-style" onclick="stopPipeline()"
+          style="margin-top:0;opacity:0.35;cursor:not-allowed;pointer-events:none"
+          title="Stop the running pipeline">Stop</button>
+        <span style="font-size:11px;color:var(--text3)">or Enter</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── View toggle ── -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)">Pipeline Progress</span>
+    <div style="display:flex;gap:4px;background:var(--bg3);padding:3px;border-radius:8px;border:1px solid var(--border)">
+      <button id="view-simple" class="view-toggle" onclick="setView('simple')">Simple</button>
+      <button id="view-detail" class="view-toggle active" onclick="setView('detail')">Detailed</button>
+    </div>
+  </div>
+
+  <!-- ── Simple view: coffee mode ── -->
+  <div id="simple-view" style="display:none">
+    <div class="coffee-card">
+      <!-- DNA/helix loading animation instead of coffee cup -->
+      <div class="bio-loader" id="bio-loader">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="24" stroke="#1a0f2e" stroke-width="3"/>
+          <circle cx="28" cy="28" r="24" stroke="url(#grad)" stroke-width="3"
+                  stroke-dasharray="150" stroke-dashoffset="150" stroke-linecap="round" id="bio-arc">
+            <animateTransform attributeName="transform" type="rotate" from="0 28 28" to="360 28 28" dur="1.4s" repeatCount="indefinite"/>
+          </circle>
+          <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#a855f7"/>
+              <stop offset="100%" style="stop-color:#00c9b1"/>
+            </linearGradient>
+          </defs>
+          <!-- center nodes -->
+          <circle cx="28" cy="14" r="3" fill="#a855f7" opacity="0.8"/>
+          <circle cx="28" cy="28" r="3" fill="#00c9b1" opacity="0.8"/>
+          <circle cx="28" cy="42" r="3" fill="#a855f7" opacity="0.8"/>
+          <line x1="28" y1="14" x2="28" y2="42" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+        </svg>
+      </div>
+      <div class="coffee-title" id="coffee-title">Ready</div>
+      <div class="coffee-sub"   id="coffee-sub">Enter a paper ID or upload a PDF</div>
+      <div class="coffee-layer-msg" id="coffee-layer-msg" style="display:none">
+        <span class="spinner"></span>
+        <span id="coffee-step">Starting…</span>
+      </div>
+      <div class="coffee-progress-wrap" id="coffee-progress-wrap" style="display:none">
+        <div class="coffee-bar-track">
+          <div class="coffee-bar-fill" id="coffee-bar" style="width:0%"></div>
+        </div>
+        <div class="coffee-bottom">
+          <span class="coffee-eta"  id="coffee-eta"></span>
+          <span class="coffee-step" id="coffee-step-r"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Detailed view: full-screen flowing terminal ── -->
+  <div id="stream-view" style="display:block">
+    <div class="stream-terminal" id="stream-terminal">
+      <div class="stream-bar">
+        <span class="stream-bar-title">
+          Pipeline Log
+          <span id="stream-layer-indicator" class="stream-layer-indicator"></span>
+        </span>
+        <button class="stream-bar-btn" onclick="clearStream()">Clear</button>
+        <button class="stream-bar-btn" id="stop-btn" onclick="stopPipeline()" title="Stop current pipeline run"
+          style="border-color:#f87171;color:#f87171;opacity:0.35;cursor:not-allowed;pointer-events:none">Stop</button>
+        <button class="stream-bar-btn" onclick="scrollStreamBottom()">End</button>
+        <button class="stream-bar-btn" id="fs-btn" onclick="toggleFullscreen()" title="Toggle fullscreen">Fullscreen</button>
+        <button class="stream-exit-btn" onclick="exitFullscreen()" title="Exit fullscreen">Exit</button>
+      </div>
+      <div class="stream-lines" id="stream-lines">
+        <div class="stream-idle">Waiting for pipeline to start…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Layer cards (hidden, still updated for data) ── -->
+  <div class="layers" id="layers-detail" style="display:none">
+
+    <div class="lcard pending" id="lc-1">
+      <div class="lcard-head" onclick="toggleL(1)">
+        <div class="lnum" id="ln-1">1</div>
+        <div class="linfo">
+          <div class="lname">Source Registry</div>
+          <div class="lmsg" id="lm-1">Resolves input and selects the correct data source</div>
+        </div>
+        <span class="lstatus" id="ls-1">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-1" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-1"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-2">
+      <div class="lcard-head" onclick="toggleL(2)">
+        <div class="lnum" id="ln-2">2</div>
+        <div class="linfo">
+          <div class="lname">Deduplication Check</div>
+          <div class="lmsg" id="lm-2">Checks if this paper is already in the knowledge graph</div>
+        </div>
+        <span class="lstatus" id="ls-2">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-2" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-2"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-3">
+      <div class="lcard-head" onclick="toggleL(3)">
+        <div class="lnum" id="ln-3">3</div>
+        <div class="linfo">
+          <div class="lname">Universal Fetcher</div>
+          <div class="lmsg" id="lm-3">Fetches and segments the paper into text chunks</div>
+        </div>
+        <span class="lstatus" id="ls-3">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-3" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-3"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-4">
+      <div class="lcard-head" onclick="toggleL(4)">
+        <div class="lnum" id="ln-4">4</div>
+        <div class="linfo">
+          <div class="lname">NER + Negation Detection</div>
+          <div class="lmsg" id="lm-4">Tags biological entities and detects negation</div>
+        </div>
+        <span class="lstatus" id="ls-4">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-4" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-4"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-5">
+      <div class="lcard-head" onclick="toggleL(5)">
+        <div class="lnum" id="ln-5">5</div>
+        <div class="linfo">
+          <div class="lname">Taxonomy Schema</div>
+          <div class="lmsg" id="lm-5">Loads 87 relation types and 39 entity types</div>
+        </div>
+        <span class="lstatus" id="ls-5">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-5" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-5"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-6">
+      <div class="lcard-head" onclick="toggleL(6)">
+        <div class="lnum" id="ln-6">6</div>
+        <div class="linfo">
+          <div class="lname">LLM Extraction Engine</div>
+          <div class="lmsg" id="lm-6">Extracts structured biological relations with Pydantic enforcement</div>
+        </div>
+        <span class="lstatus" id="ls-6">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-6"></div></div>
+      <div class="lbody" id="lbody-6"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-7">
+      <div class="lcard-head" onclick="toggleL(7)">
+        <div class="lnum" id="ln-7">7</div>
+        <div class="linfo">
+          <div class="lname">Post-Extraction Validation</div>
+          <div class="lmsg" id="lm-7">Validates, deduplicates, and detects contradictions</div>
+        </div>
+        <span class="lstatus" id="ls-7">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-7" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-7"></div>
+    </div>
+
+    <div class="lcard pending" id="lc-8">
+      <div class="lcard-head" onclick="toggleL(8)">
+        <div class="lnum" id="ln-8">8</div>
+        <div class="linfo">
+          <div class="lname">Publish to Knowledge Graph</div>
+          <div class="lmsg" id="lm-8">Writes triples to Neo4j CSV and MeTTa atomspace</div>
+        </div>
+        <span class="lstatus" id="ls-8">—</span>
+        <span class="lchev">▾</span>
+      </div>
+      <div class="lprogress"><div class="lbar" id="lb-8" style="width:100%"></div></div>
+      <div class="lbody" id="lbody-8"></div>
+    </div>
+
+  </div>
+
+  <!-- ── Output ── -->
+  <div class="output" id="output">
+
+    <!-- Output selector cards — KG cards + PLN card on same row -->
+    <div class="out-selector" id="out-selector">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:stretch" id="all-cards-row">
+        <div class="out-cards" id="out-cards" style="display:contents">
+          <!-- Populated by JS after Layer 8 completes -->
+        </div>
+        <!-- PLN card — same row, purple style kept -->
+        <div id="pln-cards" style="display:contents">
+          <!-- PLN card populated by JS -->
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Inline verification summary (always visible after run) -->
+    <div id="ver-content" style="display:none;margin-top:12px"></div>
+
+  </div>
+
+  <!-- ── Inspect actions — hidden, keep for JS compatibility ── -->
+  <div id="inspect-section" style="display:none">
+    <div id="inspect-actions"></div>
+  </div>
+
+  <!-- ── Human Review Section ── -->
+  <div id="review-section" style="display:none;margin-top:20px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--yellow);margin-bottom:10px">
+      ⚠ Human Review Required
+    </div>
+    <div id="review-cards" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- ── Commit to Atomspace — shown AFTER output ── -->
+  <div id="commit-section" style="display:none;margin-top:20px;margin-bottom:40px">
+
+    <!-- Step 1: Without PLN -->
+    <div class="commit-step">
+      <div class="commit-step-title">
+        <span style="background:var(--green2);color:#fff;padding:1px 8px;border-radius:20px;font-size:10px">Step 1</span>
+        Commit to Unified Knowledge Graph
+      </div>
+      <div class="commit-step-sub">
+        Commits extracted triples to the unified Neo4j and/or MeTTa atomspace (without PLN reasoning).
+        Format follows your selection above.
+      </div>
+      <div id="staging-breakdown" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:12px;line-height:1.8"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="fmt-group" id="commit-fmt-group">
+          <button class="fmt-chip" onclick="setCommitFmt('neo4j',this)">Neo4j only</button>
+          <button class="fmt-chip" onclick="setCommitFmt('metta',this)">MeTTa only</button>
+          <button class="fmt-chip active" onclick="setCommitFmt('both',this)">Both (recommended)</button>
+        </div>
+        <button class="run-btn" id="commit-btn" onclick="commitToAtomspace()"
+          style="background:linear-gradient(135deg,#059669,#10b981);padding:10px 24px;font-size:13px;margin-top:0;width:auto">
+          Commit to Unified KG
+        </button>
+        <button onclick="discardRun()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--font)">
+          Discard
+        </button>
+      </div>
+      <div id="commit-result" style="margin-top:14px;display:none"></div>
+    </div>
+
+    <!-- Step 2: With PLN (shown after step 1 commit) — hidden when ENABLE_PLN=false -->
+    <div class="commit-step pln-step" id="pln-commit-step" data-pln-feature style="display:none">
+      <div class="commit-step-title" style="color:var(--pln)">
+        <span style="background:var(--pln2);color:#fff;padding:1px 8px;border-radius:20px;font-size:10px">Step 2</span>
+        🔮 Commit to Unified PLN AtomSpace
+      </div>
+      <div class="commit-step-sub">
+        Updates the MeTTa PLN atomspace with SimpleTruthValues (stv), inferred triples, and contradiction resolutions.
+        stv confidence grows as more papers are added.
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="run-btn" id="pln-commit-btn" onclick="commitPLN()"
+          style="background:linear-gradient(135deg,var(--pln2),var(--pln));padding:10px 24px;font-size:13px;margin-top:0;width:auto">
+          🔮 &nbsp;Commit to Unified PLN
+        </button>
+        <span style="font-size:11px;color:var(--text3)">MeTTa only · stv updates automatically with each paper</span>
+      </div>
+      <div id="pln-commit-result" style="margin-top:14px;display:none"></div>
+    </div>
+
+  </div>
+
+</div>
+
+</div><!-- end page-pipeline -->
+
+<div id="page-query" style="display:none;padding:12px 20px 24px">
+
+  <!-- Header row -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div>
+      <h2 style="margin:0;font-size:18px;font-weight:700;color:var(--text1,#e6edf3)">🔍 Query Knowledge Graph</h2>
+      <p style="margin:4px 0 0;font-size:12px;color:var(--text3,#6e7681)">
+        Add entity nodes to the canvas, connect them, then run the query against the committed unified database.
+      </p>
+    </div>
+    <!-- DB selector -->
+    <div class="qb-db-bar">
+      <span class="qb-db-label">Database:</span>
+      <div class="query-db-tabs">
+        <button class="qb-db-tab query-db-tab active" data-db="neo4j">Neo4j</button>
+        <button class="qb-db-tab query-db-tab" data-db="metta">MeTTa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Builder -->
+  <div class="qb-layout">
+
+    <!-- Left palette -->
+    <div class="qb-palette">
+      <div class="qb-palette-title">Entity Types</div>
+      <div id="qb-palette-items"></div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="qb-canvas" id="qb-canvas">
+      <svg class="qb-edges" id="qb-svg"></svg>
+
+      <!-- Hint shown when empty -->
+      <div class="qb-canvas-hint" id="qb-canvas-hint">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="10" cy="20" r="8" fill="#1d4ed8" opacity=".7"/>
+          <circle cx="30" cy="20" r="8" fill="#b91c1c" opacity=".7"/>
+          <line x1="18" y1="20" x2="22" y2="20" stroke="#58a6ff" stroke-width="2" stroke-dasharray="3 2"/>
+        </svg>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Click an entity type on the left</div>
+        <div style="font-size:11px">to add it · click handle to connect · double-click to remove</div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="qb-toolbar">
+        <button class="qb-tool-btn qb-tool-clear" id="qb-clear-btn">✕ Clear</button>
+        <button class="qb-tool-btn qb-tool-run" id="qb-run-btn">▶ Run Query</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="qb-result">
+    <div class="qb-result-meta" id="qb-result-meta"></div>
+    <iframe id="qb-result-frame" src="about:blank"
+      style="width:100%;height:540px;border:1px solid var(--border,#30363d);border-radius:10px;display:block"></iframe>
+  </div>
+
+</div><!-- end page-query -->
+
+<div id="page-unified" style="display:none;height:calc(100vh - 50px);flex-direction:column">
+  <div style="display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border,#30363d);background:var(--bg,#0d1117)">
+    <span style="font-size:13px;font-weight:600;color:var(--text2,#8b949e)">Database:</span>
+    <select id="unified-db-sel" onchange="loadUnifiedKG()" style="background:var(--surface1,#161b22);border:1px solid var(--border,#30363d);color:var(--text1,#e6edf3);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer">
+      <option value="neo4j">Neo4j</option>
+      <option value="metta">MeTTa</option>
+    </select>
+    <button onclick="loadUnifiedKG()" style="padding:5px 14px;background:transparent;border:1px solid var(--border,#30363d);border-radius:6px;color:var(--text2,#8b949e);font-size:12px;cursor:pointer">↺ Refresh</button>
+<button onclick="window.open(document.getElementById('unified-frame').src,'_blank')" style="padding:5px 14px;background:transparent;border:1px solid var(--border,#30363d);border-radius:6px;color:var(--text2,#8b949e);font-size:12px;cursor:pointer">↗ Full screen</button>
+    <button onclick="switchTab('query')" style="padding:5px 14px;background:transparent;border:1px solid #1f6feb55;border-radius:6px;color:#58a6ff;font-size:12px;cursor:pointer;font-weight:600">🔍 Query KG</button>
+  </div>
+  <iframe id="unified-frame" src="about:blank"
+    style="flex:1;width:100%;border:none;height:calc(100vh - 160px);min-height:500px"
+    onload="
+      try {
+        const win = this.contentWindow;
+        const doc = win.document;
+        setTimeout(() => {
+          try {
+            // Find and click the Unified KG tab by text content (reliable across all papers)
+            const tabs = Array.from(doc.querySelectorAll('button.tab, .tab'));
+            const utab = tabs.find(t =>
+              t.textContent && t.textContent.trim().includes('Unified') &&
+              !t.textContent.includes('Verification') &&
+              !t.textContent.includes('PLN')
+            );
+            if (utab) {
+              utab.click();
+            } else if (typeof win.show === 'function') {
+              // Fallback: try show(2), show(3), show(4) until one shows "Unified"
+              for (let i = 2; i <= 5; i++) {
+                win.show(i);
+                const active = doc.querySelector('.tab.active');
+                if (active && active.textContent.includes('Unified') && !active.textContent.includes('Verification')) break;
+              }
+            }
+          } catch(e){}
+          // Fit all vis.js networks after tab switch
+          setTimeout(() => {
+            try {
+              [win._network, win.network, win._unifiedNetwork].forEach(n => {
+                try { if(n && typeof n.fit==='function') n.fit(); } catch(e){}
+              });
+            } catch(e){}
+          }, 600);
+        }, 800);
+      } catch(e){}
+    "></iframe>
+</div>
+
+<!-- ── Sources slide-over ── -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSources()">
+  <div class="slideover">
+    <div class="so-head">
+      <h2>Data Sources</h2>
+      <button class="close-btn" onclick="closeSources()">✕</button>
+    </div>
+    <div class="so-body" id="so-body">
+      <div style="color:var(--text3);font-size:13px">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Full-screen HTML viewer modal ── -->
+<div id="file-modal" class="file-modal" onclick="if(event.target===this)closeModal()">
+  <div class="file-modal-inner">
+    <div class="file-modal-bar">
+      <span id="modal-title" class="file-modal-title"></span>
+      <div class="file-modal-actions">
+        <button onclick="openModalInTab()" class="modal-action-btn" title="Open in new tab">⬡ New tab</button>
+        <button onclick="closeModal()" class="modal-close-btn">✕</button>
+      </div>
+    </div>
+    <div class="file-modal-body">
+      <iframe id="modal-frame" src="about:blank" frameborder="0"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="/static/state.js"></script>
+<script src="/static/main.js"></script>
+<script src="/static/query/vis-network.min.js"></script>
+<script src="/static/query/query.js"></script>
+<script src="/static/query/query-builder.js"></script>
+
+<footer style="
+  padding:14px 28px;margin-top:32px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;
+">
+  <span style="color:var(--text3);font-size:11px">
+    &copy; 2026 <strong style="color:var(--text2);letter-spacing:.02em">Rejuvebio Tech</strong>
+    <span style="margin:0 6px;opacity:.4">·</span>
+    Bio-Semantic Parser
+  </span>
+</footer>
+</body>
+</html>

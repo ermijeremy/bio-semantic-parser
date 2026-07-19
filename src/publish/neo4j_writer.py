@@ -147,7 +147,13 @@ def write(records: list, run_dir: Path = None) -> dict:
         "edge_types":  sorted({rel for eg in edge_groups.values() for rel, _ in eg}),
         "node_count":  sum(len(v) for v in nodes.values()),
         "edge_count":  sum(
-            len(rows) for eg in edge_groups.values() for rows in eg.values()
+            1
+            for eg in edge_groups.values()
+            for rows in eg.values()
+            for r in rows
+            if (r.get("subject_id") and r.get("object_id")
+                and r.get("subject_id") != "NEEDS_REVIEW"
+                and r.get("object_id") != "NEEDS_REVIEW")
         ),
     }
 

@@ -123,7 +123,7 @@ def process(records: list, verbose: bool = False, text_by_doc: dict = None,
         }
 
     # ── Validation Gate ───────────────────────────────────────────────────────
-    log(f"Validation Gate (threshold={_THRESHOLD})")
+    log("Validation Gate")
     auto_insert, human_review = route(records)
     log(f"  → {len(auto_insert)} auto-insert  |  {len(human_review)} → human review")
 
@@ -141,16 +141,25 @@ def process(records: list, verbose: bool = False, text_by_doc: dict = None,
             # that actually passed the gate.
             _sc.execute("UPDATE triples SET flagged_for_review=1")
             for _r in auto_insert:
-                _sid = _r.get("subject_id", "")
-                _oid = _r.get("object_id",  "")
-                _rel = _r.get("relation",   "")
-                _neg = 1 if _r.get("negated") else 0
-                if _sid and _oid and _rel:
+                _tid = _r.get("triple_id")
+                if _tid:
+                    # Primary-key match — reliable even for TEXT: entity IDs
                     _sc.execute(
-                        "UPDATE triples SET flagged_for_review=0 "
-                        "WHERE subject_id=? AND relation=? AND object_id=? AND negated=?",
-                        (_sid, _rel, _oid, _neg),
+                        "UPDATE triples SET flagged_for_review=0 WHERE id=?",
+                        (_tid,),
                     )
+                else:
+                    # Fallback: content match (no triple_id assigned)
+                    _sid = _r.get("subject_id", "")
+                    _oid = _r.get("object_id",  "")
+                    _rel = _r.get("relation",   "")
+                    _neg = 1 if _r.get("negated") else 0
+                    if _sid and _oid and _rel:
+                        _sc.execute(
+                            "UPDATE triples SET flagged_for_review=0 "
+                            "WHERE subject_id=? AND relation=? AND object_id=? AND negated=?",
+                            (_sid, _rel, _oid, _neg),
+                        )
             _sc.commit()
             _sc.close()
         except Exception:

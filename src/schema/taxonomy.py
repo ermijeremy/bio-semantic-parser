@@ -10,7 +10,7 @@ Sources (5 schemas — all aligned to 100% coverage)
                                    Paper: https://aclanthology.org/W11-1801
   • Hetionet v1.0                — network medicine metaedge types
                                    https://het.io/ | https://github.com/hetio/hetionet
-                                   Paper: https://elifesciences.org/articles/26726
+                                   https://github.com/hetio/hetionet/blob/main/describe/definitions.json
   • OpenBioLink                  — large-scale KG benchmark edge types
                                    https://github.com/OpenBioLink/OpenBioLink
                                    Paper: https://doi.org/10.1093/bioinformatics/btaa274
@@ -226,6 +226,13 @@ class RelationType(str, Enum):
     CONTRAINDICATED_IN            = "contraindicated_in"            # drug/treatment is contraindicated in a disease or patient group
     IN_CLINICAL_TRIALS_FOR        = "in_clinical_trials_for"        # drug/intervention is currently in clinical trials for a disease
 
+    # ── Category 23: Clinical outcome / risk relations (Biolink v4) ────────────
+    # biolink:predisposes (RO:0003302), biolink:manifestation_of (RO:0002452),
+    # biolink:associated_with_likelihood_of
+    PREDISPOSES                   = "predisposes"                   # A increases probability/risk of B without being sufficient cause (biolink:predisposes / RO:0003302)
+    MANIFESTATION_OF              = "manifestation_of"              # phenotypic feature / clinical sign A is a manifestation of disease B (biolink:manifestation_of / RO:0002452)
+    ASSOCIATED_WITH_LIKELIHOOD_OF = "associated_with_likelihood_of" # statistical/probabilistic evidence that entity A correlates with altered likelihood of condition B (biolink:associated_with_likelihood_of)
+
     # ── Category 22: Biolink completeness additions ─────────────────────────────
     # Inverse transcript/protein relations, complex membership, metabolite,
     # genetic/pharmacological interaction, temporal, amelioration, exacerbation, taxon
@@ -304,6 +311,73 @@ class EntityType(str, Enum):
     # ── Taxonomy ──────────────────────────────────────────────────────────────
     ORGANISM                    = "ORGANISM"                    # NCBI Taxonomy ID
 
+    # ── Clinical entities (biolink:ClinicalEntity hierarchy) ──────────────────
+    # Source: Biolink Model v4.4.2 — classes extracted directly from biolink-model.yaml
+    CLINICAL_ENTITY             = "CLINICAL_ENTITY"             # biolink:ClinicalEntity — any entity in the clinical domain outside the biological realm
+    CLINICAL_INTERVENTION       = "CLINICAL_INTERVENTION"       # biolink:ClinicalIntervention — medical procedure, treatment, or action taken to modify the course of a disease (e.g. home BP monitoring, surgery, therapy)
+    CLINICAL_FINDING            = "CLINICAL_FINDING"            # biolink:ClinicalFinding — clinical observation, lab measurement, or biological feature observed in a patient
+    PROCEDURE                   = "PROCEDURE"                   # biolink:Procedure — a series of actions conducted in a certain order or manner (medical or experimental)
+    DEVICE                      = "DEVICE"                      # biolink:Device — a piece of mechanical or electronic equipment used for a specific purpose (e.g. monitoring device, implant)
+    DIAGNOSTIC_AID              = "DIAGNOSTIC_AID"              # biolink:DiagnosticAid — a device or substance used to help diagnose disease or injury
+    TREATMENT                   = "TREATMENT"                   # biolink:Treatment — a treatment targeted at a disease or phenotype, may involve drugs, procedures, or behavioral interventions
+    DRUG                        = "DRUG"                        # biolink:Drug — a substance for diagnosis, cure, mitigation, treatment, or prevention of disease (broader than SMALL_MOLECULE; includes biologics)
+
+    # ── Exposure & environment ────────────────────────────────────────────────
+    EXPOSURE_EVENT              = "EXPOSURE_EVENT"              # biolink:ExposureEvent — incidence of an environmental feature that influences an organism (chemical, behavioral, geographic)
+    CHEMICAL_EXPOSURE           = "CHEMICAL_EXPOSURE"           # biolink:ChemicalExposure — intake of a particular chemical entity
+    BEHAVIORAL_EXPOSURE         = "BEHAVIORAL_EXPOSURE"         # biolink:BehavioralExposure — a factor relating to behavior impacting an individual
+    ENVIRONMENTAL_EXPOSURE      = "ENVIRONMENTAL_EXPOSURE"      # biolink:EnvironmentalExposure — factor relating to abiotic processes in the environment
+    ENVIRONMENTAL_FEATURE       = "ENVIRONMENTAL_FEATURE"       # biolink:EnvironmentalFeature — a system or entity in the natural environment (abiotic)
+    FOOD                        = "FOOD"                        # biolink:Food — a substance consumed to provide nutritional support (e.g. low-sodium diet, processed food)
+
+    # ── Behavior & activity ───────────────────────────────────────────────────
+    ACTIVITY                    = "ACTIVITY"                    # biolink:Activity — something that occurs over a period of time and acts upon entities (includes study, trial, clinical activity)
+    BEHAVIOR                    = "BEHAVIOR"                    # biolink:Behavior — the internally coordinated responses of organisms to internal or external stimuli (lifestyle, adherence)
+    BEHAVIORAL_FEATURE          = "BEHAVIORAL_FEATURE"          # biolink:BehavioralFeature — a phenotypic feature which is behavioral in nature
+
+    # ── Physiological & pathological processes ────────────────────────────────
+    PHYSIOLOGICAL_PROCESS       = "PHYSIOLOGICAL_PROCESS"       # biolink:PhysiologicalProcess — a biological or chemical function within a living organism (e.g. blood pressure regulation)
+    PATHOLOGICAL_PROCESS        = "PATHOLOGICAL_PROCESS"        # biolink:PathologicalProcess — a biologic function having an abnormal or deleterious effect at subcellular or organismal level
+
+    # ── Population & study ───────────────────────────────────────────────────
+    POPULATION                  = "POPULATION"                  # biolink:PopulationOfIndividualOrganisms — a collection of individuals from the same taxonomic class (e.g. patient cohort)
+    COHORT                      = "COHORT"                      # biolink:Cohort — a group treated as a group who share common characteristics in a study
+    STUDY                       = "STUDY"                       # biolink:Study — a detailed investigation and/or analysis
+    CLINICAL_TRIAL              = "CLINICAL_TRIAL"              # biolink:ClinicalTrial — a research study that prospectively assigns participants to interventions
+
+    # ── Organism ─────────────────────────────────────────────────────────────
+    LIFE_STAGE                  = "LIFE_STAGE"                  # biolink:LifeStage — a stage of development or growth of an organism, including post-natal adult stages (e.g. elderly, adolescent)
+    INDIVIDUAL_ORGANISM         = "INDIVIDUAL_ORGANISM"         # biolink:IndividualOrganism — a single instance of an organism (e.g. a patient, a model animal)
+
+    # ── Clinical attributes & outcomes (biolink:Attribute subclasses) ────────
+    CLINICAL_MEASUREMENT        = "CLINICAL_MEASUREMENT"        # biolink:ClinicalMeasurement — a lab or clinical observation result (e.g. blood pressure reading, BMI, HbA1c level)
+    CLINICAL_ATTRIBUTE          = "CLINICAL_ATTRIBUTE"          # biolink:ClinicalAttribute — general attribute relating to a clinical manifestation
+    ONSET                       = "ONSET"                       # biolink:Onset — the age group or time point at which disease symptoms first appear
+    EPIDEMIOLOGICAL_OUTCOME     = "EPIDEMIOLOGICAL_OUTCOME"     # biolink:EpidemiologicalOutcome — a societal or population-level outcome such as disease burden, incidence rate, or mortality
+    MORTALITY_OUTCOME           = "MORTALITY_OUTCOME"           # biolink:MortalityOutcome — an outcome of death resulting from an exposure event or disease
+    BEHAVIORAL_OUTCOME          = "BEHAVIORAL_OUTCOME"          # biolink:BehavioralOutcome — an outcome resulting from an exposure event manifested as human behavior
+    DISEASE_OUTCOME             = "DISEASE_OUTCOME"             # biolink:DiseaseOrPhenotypicFeatureOutcome — physiological outcome resulting from an exposure event
+
+    # ── Clinical patient ──────────────────────────────────────────────────────
+    CASE                        = "CASE"                        # biolink:Case — an individual human organism that has a patient role in a clinical context
+
+    # ── Specific anatomical / genomic ─────────────────────────────────────────
+    GROSS_ANATOMICAL_STRUCTURE  = "GROSS_ANATOMICAL_STRUCTURE"  # biolink:GrossAnatomicalStructure — an anatomical structure with more than one cell (e.g. organ, limb, gland)
+    GENOME                      = "GENOME"                      # biolink:Genome — the sum of genetic material within a cell or virion
+    GENETIC_INHERITANCE         = "GENETIC_INHERITANCE"         # biolink:GeneticInheritance — the pattern or mode in which a genetic trait or disorder is passed across generations
+    VIRUS                       = "VIRUS"                       # biolink:Virus — a virus organism (for virology, infectious disease papers)
+    MICRO_RNA                   = "MICRO_RNA"                   # biolink:MicroRNA — a small (~22 nt) endogenous RNA that regulates gene expression post-transcriptionally
+    SI_RNA                      = "SI_RNA"                      # biolink:SiRNA — a small RNA produced from exogenous or endogenous dsRNA used in gene silencing
+
+    # ── Population & study subtypes ───────────────────────────────────────────
+    STUDY_POPULATION            = "STUDY_POPULATION"            # biolink:StudyPopulation — a group of people treated as participants in a research study
+    ORGANISM_TAXON              = "ORGANISM_TAXON"              # biolink:OrganismTaxon — a taxonomic classification (e.g. NCBITaxon:9606 Homo sapiens)
+
+    # ── Events & phenomena ────────────────────────────────────────────────────
+    EVENT                       = "EVENT"                       # biolink:Event — something that happens at a given place and time (biological or clinical event)
+    PHENOMENON                  = "PHENOMENON"                  # biolink:Phenomenon — an observed fact or situation whose cause may be under investigation
+    ENVIRONMENTAL_PROCESS       = "ENVIRONMENTAL_PROCESS"       # biolink:EnvironmentalProcess — a process that occurs within or involves components of an environmental system
+
     # ── Catch-all ─────────────────────────────────────────────────────────────
     OTHER                       = "OTHER"                       # does not fit above — flag for review
 
@@ -325,6 +399,7 @@ class SectionLabel(str, Enum):
 # ══════════════════════════════════════════════════════════════════════════════
 # SECTION 4 — Full definitions (given to LLM in the extraction prompt)
 # Each entry: definition · example · not_this
+# Sources: https://biolink.github.io/biolink-model/ · https://github.com/hetio/hetionet/blob/main/describe/definitions.json
 # ══════════════════════════════════════════════════════════════════════════════
 
 TAXONOMY: Dict[RelationType, dict] = {
@@ -365,14 +440,14 @@ TAXONOMY: Dict[RelationType, dict] = {
         "not_this": "Use ACTIVATES if the effect is on protein activity rather than abundance. Use TRANSCRIBES_TO if the transcription event itself is described.",
     },
     RelationType.DOWNREGULATES: {
-        "definition": "A decreases the expression level of B — specifically mRNA or protein abundance.",
+        "definition": "A decreases the expression level of B — specifically mRNA or protein abundance as measured by molecular assays (sequencing, qPCR, proteomics). Strictly molecular: subject and object must be genes, proteins, or molecular entities.",
         "example": "Ageing downregulates FOXO3 protein levels in human skeletal muscle.",
-        "not_this": "Use INHIBITS if the effect is on activity rather than abundance. Use PREVENTS if A blocks a process from occurring.",
+        "not_this": "Use INHIBITS if the effect is on protein activity rather than abundance. Use PREVENTS if A blocks a process. Use REGULATES if the subject is a dietary factor, clinical intervention, or physiological condition affecting a non-molecular outcome (e.g. sodium intake and blood pressure — use REGULATES, not DOWNREGULATES).",
     },
     RelationType.REGULATES: {
-        "definition": "A modulates B without a specified direction, or controls B in a context-dependent bidirectional manner.",
+        "definition": "A modulates B without a specified direction, or controls B in a context-dependent bidirectional manner. Applies at any level: molecular (gene/protein), physiological (e.g. dietary sodium regulates blood pressure), or clinical (e.g. treatment regulates glucose levels).",
         "example": "mTORC1 regulates autophagy depending on nutrient availability.",
-        "not_this": "Prefer ACTIVATES/INHIBITS or UPREGULATES/DOWNREGULATES when direction is clear. Use REGULATES only when direction is genuinely unspecified or bidirectional across conditions.",
+        "not_this": "Prefer ACTIVATES/INHIBITS or UPREGULATES/DOWNREGULATES when the effect is specifically on mRNA or protein abundance. Use REGULATES for physiological, dietary, or clinical regulation where direction is unspecified or context-dependent. Do NOT use DOWNREGULATES for dietary or physiological effects on non-molecular outcomes — use REGULATES instead.",
     },
 
     # ── Category 3: PTMs ──────────────────────────────────────────────────────
@@ -849,6 +924,26 @@ TAXONOMY: Dict[RelationType, dict] = {
         "example": "FOXO3 gene is in_taxon Homo sapiens.",
         "not_this": "Use ORGANISM as an EntityType when the taxon is itself a node in the graph. IN_TAXON as a relation links a biological entity to its species context — useful for cross-species papers.",
     },
+
+    # ── Category 23: Clinical outcome / risk (Biolink v4 formal definitions) ───
+
+    RelationType.PREDISPOSES: {
+        "definition": "A is a predisposing factor for B if A (e.g. a genetic variant, environmental exposure, physiological condition, or behavioral factor) increases the probability or risk of B occurring in an organism or population, without being a sufficient cause of B. Formally: biolink:predisposes / RO:0003302.",
+        "example": "Obesity predisposes individuals to type 2 diabetes.",
+        "not_this": "Use CAUSES if A is a direct and sufficient cause of B. Use CONTRIBUTES_TO if A is a partial causal factor with a mechanistic link. Use ASSOCIATES_WITH if the link is purely statistical with no established mechanistic or risk pathway.",
+    },
+
+    RelationType.MANIFESTATION_OF: {
+        "definition": "Phenotypic feature, symptom, or clinical sign A is a manifestation of underlying disease or disorder B — A is characteristically expressed in the context of B. Formally: biolink:manifestation_of / RO:0002452 (inverse of has_manifestation).",
+        "example": "Memory impairment is a manifestation_of Alzheimer's disease.",
+        "not_this": "Use HAS_SYMPTOM / HAS_PHENOTYPE if the subject is the disease and the object is the clinical feature. MANIFESTATION_OF is written from the feature's perspective: feature manifestation_of disease.",
+    },
+
+    RelationType.ASSOCIATED_WITH_LIKELIHOOD_OF: {
+        "definition": "There is statistical or probabilistic evidence that entity A is associated with an altered likelihood (increased or decreased probability) of condition or phenotype B occurring. More specific than ASSOCIATES_WITH — explicitly quantifies a probabilistic link rather than a generic co-occurrence. Formally: biolink:associated_with_likelihood_of.",
+        "example": "BRCA1 pathogenic variant is associated_with_likelihood_of breast cancer.",
+        "not_this": "Use PREDISPOSES if there is a known mechanistic or risk pathway. Use ASSOCIATES_WITH for generic statistical co-occurrence without a probabilistic framing. Use CAUSES for direct causal relationships.",
+    },
 }
 
 
@@ -955,6 +1050,10 @@ CROSS_SCHEMA_MAP: Dict[RelationType, dict] = {
     RelationType.AMELIORATES:                     {"bionlp": None, "hetionet": None, "openbiolink": None, "biolink": "biolink:ameliorates_condition"},
     RelationType.EXACERBATES:                     {"bionlp": None, "hetionet": None, "openbiolink": None, "biolink": "biolink:exacerbates_condition"},
     RelationType.IN_TAXON:                        {"bionlp": None, "hetionet": None, "openbiolink": None, "biolink": "biolink:in_taxon (RO:0002162)"},
+    # Category 23: Clinical outcome / risk (Biolink v4)
+    RelationType.PREDISPOSES:                     {"bionlp": None, "hetionet": None, "openbiolink": None, "biolink": "biolink:predisposes (RO:0003302)"},
+    RelationType.MANIFESTATION_OF:                {"bionlp": None, "hetionet": None, "openbiolink": None, "biolink": "biolink:manifestation_of (RO:0002452)"},
+    RelationType.ASSOCIATED_WITH_LIKELIHOOD_OF:   {"bionlp": None, "hetionet": None, "openbiolink": None, "biolink": "biolink:associated_with_likelihood_of"},
 }
 
 
@@ -1053,6 +1152,9 @@ BIOLINK_MAPPING: Dict[RelationType, str] = {
     RelationType.AMELIORATES:                       "biolink:ameliorates_condition",
     RelationType.EXACERBATES:                       "biolink:exacerbates_condition",
     RelationType.IN_TAXON:                          "biolink:in_taxon",
+    RelationType.PREDISPOSES:                       "biolink:predisposes",
+    RelationType.MANIFESTATION_OF:                  "biolink:manifestation_of",
+    RelationType.ASSOCIATED_WITH_LIKELIHOOD_OF:     "biolink:associated_with_likelihood_of",
 }
 
 

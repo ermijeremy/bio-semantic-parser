@@ -1,0 +1,21 @@
+pyyaml
+requests
+biopython
+beautifulsoup4
+pymupdf
+tiktoken
+pydantic
+instructor==0.4.8
+spacy==3.7.5
+scispacy
+python-dotenv
+rich
+fastapi
+uvicorn[standard]
+httpx
+openai
+python-multipart
+websockets
+transformers
+torch --index-url https://download.pytorch.org/whl/cpu
+sentence-transformers

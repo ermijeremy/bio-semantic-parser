@@ -21,9 +21,10 @@ _MODEL       = os.getenv("LLM_MODEL",       "gemma2:27b")
 _TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.0"))
 _MAX_RETRIES = int(os.getenv("MAX_RETRIES", "3"))
 _QUEUE_PATH  = Path(os.getenv("REJECTED_QUEUE", "data/rejected.jsonl"))
-_OUT_RESERVE = int(os.getenv("LLM_OUTPUT_TOKENS", "2048"))
-_WALL_TIMEOUT = int(os.getenv("LLM_WALL_TIMEOUT", "300"))
-
+_OUT_RESERVE      = int(os.getenv("LLM_OUTPUT_TOKENS", "2048"))
+_WALL_TIMEOUT     = int(os.getenv("LLM_WALL_TIMEOUT",  "300"))
+_COMPACT_TAXONOMY = os.getenv("LLM_COMPACT_TAXONOMY", "0").strip().lower() in ("1", "true", "yes")
+_MAX_ENTITIES     = int(os.getenv("LLM_MAX_ENTITIES", "0"))
 _CACHED_SYSTEM_PROMPT: str = ""
 
 def _get_system_prompt() -> str:
@@ -93,12 +94,17 @@ If no relation can be extracted, return:
 def _taxonomy_block() -> str:
     lines = ["RELATION TYPES — use ONLY values from this list:\n"]
     for rel, entry in TAXONOMY.items():
-        lines.append(
-            f"  {rel.value}\n"
-            f"    → {entry['definition']}\n"
-            f"    EXAMPLE: {entry['example']}\n"
-            f"    NOT THIS: {entry['not_this']}\n"
-        )
+        if _COMPACT_TAXONOMY:
+            not_this = entry.get("not_this", "")
+            not_clause = f" [NOT: {not_this}]" if not_this else ""
+            lines.append(f"  {rel.value}: {entry['definition']}{not_clause}")
+        else:
+            lines.append(
+                f"  {rel.value}\n"
+                f"    → {entry['definition']}\n"
+                f"    EXAMPLE: {entry['example']}\n"
+                f"    NOT THIS: {entry['not_this']}\n"
+            )
     return "\n".join(lines)
 
 
@@ -142,6 +148,9 @@ def _user_message(chunk: dict) -> str:
     section  = chunk.get("section", "unknown")
     entities = chunk.get("entities", [])
     negated  = chunk.get("negated_entities", [])
+
+    if _MAX_ENTITIES > 0 and len(entities) > _MAX_ENTITIES:
+        entities = entities[:_MAX_ENTITIES]
 
     entity_block = ""
     if entities:
@@ -207,9 +216,8 @@ def _is_truncation_error(error: str) -> bool:
     ]
     return any(s.lower() in error.lower() for s in truncation_signals)
 
-
 def _split_chunk(chunk: dict) -> list:
-    """Split a chunk's text in half at a sentence boundary, returning two sub-chunks."""
+    """Split a chunk's text in half at a sentence boundary, returning two sub-chunks (with other metadata)."""
     text = chunk.get("text", "")
     sentences = text.split(". ")
     mid = len(sentences) // 2
@@ -345,7 +353,7 @@ def extract_batch(chunks: list) -> list:
     Extract relations from a list of annotated chunks in parallel.
 
     Chunks are processed concurrently up to LLM_CHUNK_CONCURRENCY workers
-    (default 4).
+    (default 4, capped by the global LLM_GLOBAL_CONCURRENCY semaphore).
 
     Saves a per-chunk progress file so the batch can resume from cached
     results if the pipeline restarts mid-run.
