@@ -78,10 +78,6 @@ SCISPACY_MAP = {
 
 
 # ── GLiNER zero-shot labels + reverse map to schema types ─────────────────────
-# (imported from taxonomy.py above — single source of truth)
-
-
-# ── GLiNER shared base (Large and Base differ only in model_id) ───────────────
 _GLINER_MAX_TOKENS = 1800  # safe margin below 2048 hard limit
 
 
@@ -143,58 +139,8 @@ class _GLiNERBaseModel(_BaseNERModel):
 class _GLiNERLarge(_GLiNERBaseModel):
     model_id = "Ihor/gliner-biomed-large-v1.0"
 
-
-# class _GLiNERSmall(_GLiNERBaseModel):
-#     model_id = "Ihor/gliner-biomed-base-v1.0"
-
-
-# ── Stanza BioNLP13CG (CharLM + BiLSTM + CRF) ─────────────────────────────────
-_STANZA_MAP = {
-    "GENE_OR_GENE_PRODUCT": "GENE",
-    "SIMPLE_CHEMICAL": "SMALL_MOLECULE",
-    "CANCER": "CANCER",
-    "CELL": "CELL_TYPE",
-    "CELLULAR_COMPONENT": "CELLULAR_COMPONENT",
-    "ORGAN": "ANATOMY",
-    "ORGANISM": "ORGANISM",
-    "ORGANISM_SUBSTANCE": "SMALL_MOLECULE",
-    "ORGANISM_SUBDIVISION": "ANATOMY",
-    "TISSUE": "TISSUE",
-    "MULTI-TISSUE_STRUCTURE": "ANATOMY",
-    "ANATOMICAL_SYSTEM": "ANATOMY",
-    "AMINO_ACID": "SMALL_MOLECULE",
-    "PATHOLOGICAL_FORMATION": "PHENOTYPE",
-    "IMMATERIAL_ANATOMICAL_ENTITY": "ANATOMY",
-    "DEVELOPING_ANATOMICAL_STRUCTURE": "DEVELOPMENTAL_STAGE",
-}
-
-
-class _StanzaBioNLP13CG(_BaseNERModel):
-    model_id = "stanza:en/bionlp13cg"
-
-    def load(self) -> None:
-        import stanza
-        # Download is idempotent; only fetches the package the first time.
-        stanza.download("en", package="bionlp13cg",
-                        processors={"tokenize": "craft", "ner": "bionlp13cg"}, verbose=False)
-        self._nlp = stanza.Pipeline(
-            "en", package="bionlp13cg",
-            processors={"tokenize": "craft", "ner": "bionlp13cg"}, verbose=False,
-        )
-
-    def _predict(self, text: str) -> list[Entity]:
-        doc = self._nlp(text)
-        out = []
-        for ent in doc.ents:
-            label = _STANZA_MAP.get(ent.type.upper(), ent.type.upper())
-            out.append(Entity(ent.start_char, ent.end_char, ent.text, label,
-                              source="stanza", source_model=self.model_id))
-        return out
-
-
 # ── singleton accessors ───────────────────────────────────────────────────────
 _GLINER_LARGE = None
-_STANZA = None
 _singleton_lock = threading.Lock()
 
 
@@ -205,21 +151,3 @@ def get_gliner_large() -> _GLiNERLarge:
             if _GLINER_LARGE is None:
                 _GLINER_LARGE = _GLiNERLarge()
     return _GLINER_LARGE
-
-
-# def get_gliner_base() -> _GLiNERSmall:
-#     global _GLINER_BASE
-#     if _GLINER_BASE is None:
-#         with _singleton_lock:
-#             if _GLINER_BASE is None:
-#                 _GLINER_BASE = _GLiNERSmall()
-#     return _GLINER_BASE
-
-
-def get_stanza() -> _StanzaBioNLP13CG:
-    global _STANZA
-    if _STANZA is None:
-        with _singleton_lock:
-            if _STANZA is None:
-                _STANZA = _StanzaBioNLP13CG()
-    return _STANZA

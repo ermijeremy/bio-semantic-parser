@@ -1,7 +1,7 @@
 """
 Layer 4 — Pre-Extraction Orchestrator
 
-Five-model NER ensemble merged into a single span set. All spans from every
+Four-model NER ensemble merged into a single span set. All spans from every
 source are kept; on span overlap the earlier source in the ordered list wins.
 
 These entities feed the Layer 6 LLM, which can only build
@@ -13,10 +13,9 @@ merge is a union — priority only decides the winning *type* on overlap.
   1. scispaCy specialists — the 3 expert pipelines (BC5CDR, JNLPBA, BioNLP13CG),
      restricted to the types they are authoritative on: DISEASE, SMALL_MOLECULE,
      GENE, PROTEIN, CELL_TYPE, CELL_LINE, CANCER, NON_CODING_RNA.
-  2. Stanza BioNLP13CG    — CharLM+BiLSTM+CRF; anatomy / organism / tissue breadth.
-  3. GLiNER-BioMed Base   — zero-shot sweep to recover
+  2. GLiNER-BioMed Large  — zero-shot sweep to recover
                             borderline spans the larger models missed.
-  4. scispaCy weak spans  — scispaCy spans whose mapped type is NOT a specialist
+  3. scispaCy weak spans  — scispaCy spans whose mapped type is NOT a specialist
                             type (its shakier anatomy/organism guesses). Demoted
                             below the zero-shot models but still emitted as a
                             last-resort gap-filler so no recall is lost.
@@ -25,8 +24,8 @@ Every span carries its origin model (span._.source) and the model's confidence
 (span._.score); NERTagger surfaces both, plus the exact model name in
 span._.source_model, to the downstream entity dicts.
 
-scispaCy models load eagerly in __init__ (fast, always run); Stanza and GLiNER
-load lazily via singleton registry on first predict.
+scispaCy models load eagerly in __init__ (fast, always run); GLiNER
+loads lazily via singleton registry on first predict.
 """
 from __future__ import annotations
 
@@ -39,8 +38,6 @@ from spacy.tokens import Span
 from src.preextraction.ner_models import (
     Entity, SCISPACY_MAP,
     get_gliner_large as _get_gliner_large,
-    # get_gliner_base  as _get_gliner_base,
-    get_stanza       as _get_stanza,
 )
 
 from src.preextraction.ner_tagger import NERTagger
@@ -48,7 +45,6 @@ from src.preextraction import hf_ner_tagger
 from src.preextraction.negation_detector import NegationDetector
 from src.preextraction.doi_extractor import DOIExtractor
 from src.preextraction.accession_detector import AccessionDetector
-from src.preextraction.entity_validator import validate_entities
 from src.preextraction.pubtator_client import fetch_pubtator_entities
 
 _log = logging.getLogger(__name__)
@@ -84,7 +80,7 @@ def _overlaps_any(start: int, end: int, occupied: list[tuple[int, int]]) -> bool
 
 
 class Preextractor:
-    """Five-model NER ensemble with lazy, cached model loading."""
+    """Four-model NER ensemble with lazy, cached model loading."""
 
     def __init__(self):
         # scispaCy expert pipelines (always loaded at init — fast, always run).
@@ -100,10 +96,8 @@ class Preextractor:
                 _log.exception("[NER] FAILED to load scispaCy %s — ensemble will be incomplete", name)
                 setattr(self, attr, None)
 
-        # Stanza + GLiNER load lazily on first predict via registry singletons.
-        self._stanza       = None   # Stanza BioNLP13CG
-        self._gliner_large = None   # GLiNER-BioMed Large
-        # self._gliner_base = None   # GLiNER-BioMed Base
+        # GLiNER loads lazily on first predict via singleton registry.
+        self._gliner_large = None
 
         self.negation_detector  = NegationDetector()
         self.doi_extractor      = DOIExtractor()
@@ -111,23 +105,11 @@ class Preextractor:
 
     # ── lazy model accessors ────────────────────────────────────────────────────
 
-    def _stanza_model(self):
-        if self._stanza is None:
-            _log.info("[NER] lazy-loading Stanza BioNLP13CG…")
-            self._stanza = _get_stanza()
-        return self._stanza
-
     def _gliner_large_model(self):
         if self._gliner_large is None:
             _log.info("[NER] lazy-loading GLiNER-BioMed Large…")
             self._gliner_large = _get_gliner_large()
         return self._gliner_large
-
-    # def _gliner_base_model(self):
-    #     if self._gliner_base is None:
-    #         _log.info("[NER] lazy-loading GLiNER-BioMed Base…")
-    #         self._gliner_base = _get_gliner_base()
-    #     return self._gliner_base
 
     # ── ensemble ──────────────────────────────────────────────────────────────
 
@@ -171,9 +153,7 @@ class Preextractor:
         # thresholds live in their own modules and are reached via .predict().
         sources: list[tuple[str, list[Entity]]] = [
             ("scispacy",      scispacy_specialist),
-            ("stanza",        self._stanza_model().predict(text)),
             ("gliner_large",  self._gliner_large_model().predict(text)),
-            # ("gliner_base",   self._gliner_base_model().predict(text)),
             ("scispacy_weak", scispacy_weak),
         ]
 
@@ -233,9 +213,6 @@ class Preextractor:
             pt_entities = fetch_pubtator_entities(doc_id)
             if pt_entities:
                 entities = _merge_entities(entities, pt_entities)
-
-        # LLM entity validation — shorten long spans, refine vague ones
-        entities = validate_entities(entities, text)
 
         negation   = self.negation_detector.process(entities, doc)
         doi        = self.doi_extractor.extract(text)

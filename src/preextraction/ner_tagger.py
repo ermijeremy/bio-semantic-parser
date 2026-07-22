@@ -10,13 +10,10 @@ and numeric-only spans.
 class NERTagger:
     @staticmethod
     def _is_valid(text: str) -> bool:
-        """At least 30% alphabetic characters; must not start with a bracket.
-        Reject spans longer than 12 words — they are almost certainly NER noise."""
+        """At least 30% alphabetic characters; must not start with a bracket."""
         if len(text.strip()) < 2:
             return False
         if text[0] in ('[', '('):
-            return False
-        if len(text.split()) > 12:
             return False
         return sum(c.isalpha() for c in text) / len(text) >= 0.30
 
