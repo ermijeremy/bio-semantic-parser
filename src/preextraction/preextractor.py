@@ -75,14 +75,6 @@ def _char_overlaps(a_start: int, a_end: int, b_start: int, b_end: int) -> bool:
     return max(a_start, b_start) < min(a_end, b_end)
 
 
-def _covered_by(start: int, end: int, covered: list[tuple[int, int]]) -> bool:
-    """True if [start, end) is fully covered by any span in *covered*."""
-    for cs, ce in covered:
-        if cs <= start and end <= ce:
-            return True
-    return False
-
-
 def _overlaps_any(start: int, end: int, occupied: list[tuple[int, int]]) -> bool:
     """True if [start, end) overlaps ANY existing span."""
     return any(_char_overlaps(start, end, s, e) for s, e in occupied)
@@ -184,8 +176,6 @@ class Preextractor:
         for source_name, ents in sources:
             stage_spans = []
             for ent in ents:
-                if _overlaps_any(ent.start, ent.end, occupied):
-                    continue  # an earlier, higher-priority source claimed this region
                 if span_doc is None:
                     _log.warning("[NER] no doc available for char_span — skipping %r", ent.text)
                     continue
@@ -194,6 +184,9 @@ class Preextractor:
                 if span is None:
                     _log.debug("char_span returned None for %r [%d:%d] from %s",
                                ent.text, ent.start, ent.end, source_name)
+                    continue
+                # Check overlap using the EXPANDED span bounds 
+                if _overlaps_any(span.start_char, span.end_char, occupied):
                     continue
                 span._.score  = ent.score
                 span._.source = source_name

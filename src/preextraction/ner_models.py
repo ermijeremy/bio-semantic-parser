@@ -13,6 +13,7 @@ Heavy checkpoints load on first predict so importing this module stays cheap.
 from __future__ import annotations
 
 import logging
+import threading
 from dataclasses import dataclass
 
 from src.schema.taxonomy import GLINER_LABELS, GLINER_MAP
@@ -155,24 +156,31 @@ class _StanzaBioNLP13CG(_BaseNERModel):
 _GLINER_LARGE = None
 _GLINER_BASE = None
 _STANZA = None
+_singleton_lock = threading.Lock()
 
 
 def get_gliner_large() -> _GLiNERLarge:
     global _GLINER_LARGE
     if _GLINER_LARGE is None:
-        _GLINER_LARGE = _GLiNERLarge()
+        with _singleton_lock:
+            if _GLINER_LARGE is None:
+                _GLINER_LARGE = _GLiNERLarge()
     return _GLINER_LARGE
 
 
 def get_gliner_base() -> _GLiNERSmall:
     global _GLINER_BASE
     if _GLINER_BASE is None:
-        _GLINER_BASE = _GLiNERSmall()
+        with _singleton_lock:
+            if _GLINER_BASE is None:
+                _GLINER_BASE = _GLiNERSmall()
     return _GLINER_BASE
 
 
 def get_stanza() -> _StanzaBioNLP13CG:
     global _STANZA
     if _STANZA is None:
-        _STANZA = _StanzaBioNLP13CG()
+        with _singleton_lock:
+            if _STANZA is None:
+                _STANZA = _StanzaBioNLP13CG()
     return _STANZA

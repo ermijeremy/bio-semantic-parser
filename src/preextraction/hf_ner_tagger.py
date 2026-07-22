@@ -185,15 +185,16 @@ def tag_entities(text: str) -> list[dict]:
         seen.add(key)
 
         entities.append({
-            "text":       word,
-            "normalized": key,
-            "label":      entity_type,
-            "start":      start,
-            "end":        end,
-            "negated":    False,
-            "assertion":  "PRESENT",
-            "confidence": round(score, 3),
-            "source":     "hf_ner",
+            "text":           word,
+            "normalized":     key,
+            "label":          entity_type,
+            "start":          start,
+            "end":            end,
+            "negated":        False,
+            "assertion":      "PRESENT",
+            "ner_confidence": round(score, 3),
+            "confidence":     round(score, 3),
+            "source":         "hf_ner",
         })
 
     return entities
