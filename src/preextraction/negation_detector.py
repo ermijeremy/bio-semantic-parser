@@ -10,9 +10,12 @@ of a contrastive sentence are not incorrectly flagged as negated.
 """
 import os
 import re
+import logging
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+
+_log = logging.getLogger(__name__)
 
 
 
@@ -57,12 +60,22 @@ class NegationDetector:
 
     def __init__(self, hypothesis: str = _DEFAULT_HYPOTHESIS):
         self._hypothesis = hypothesis
-        self._tokenizer  = AutoTokenizer.from_pretrained(self._MODEL)
-        self._model      = AutoModelForSequenceClassification.from_pretrained(self._MODEL)
-        self._model.eval()
+        try:
+            self._tokenizer  = AutoTokenizer.from_pretrained(self._MODEL, local_files_only=True)
+            self._model      = AutoModelForSequenceClassification.from_pretrained(
+                self._MODEL, local_files_only=True
+            )
+            self._model.eval()
+            _log.info("[NER] loaded negation model %s", self._MODEL)
+        except Exception:
+            _log.exception("[NER] FAILED to load negation model %s — negation detection disabled", self._MODEL)
+            self._tokenizer = None
+            self._model = None
         # Label order: {0: contradiction, 1: entailment, 2: neutral}
     
     def _is_negated(self, clause: str) -> tuple:
+        if self._model is None:
+            return False, 0.0
         inputs = self._tokenizer(
             clause, self._hypothesis,
             return_tensors="pt",

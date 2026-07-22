@@ -1,16 +1,23 @@
 """
 Layer 4 — Self-contained NER model definitions
 
-Everything the Preextractor ensemble needs, with no dependency on any external
-NER research package: the Entity span dataclass, the scispaCy label→schema map,
-the GLiNER zero-shot label set + reverse map, and the three lazily-loaded models
+Everything the Preextractor ensemble needs: the Entity span dataclass, the
+scispaCy label→schema map, and the three lazily-loaded models
 (GLiNER-BioMed Large/Base, Stanza BioNLP13CG).
+
+GLiNER zero-shot labels and the label→schema map live in taxonomy.py
+(single source of truth).
 
 Heavy checkpoints load on first predict so importing this module stays cheap.
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
+
+from src.schema.taxonomy import GLINER_LABELS, GLINER_MAP
+
+_log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -41,8 +48,13 @@ class _BaseNERModel:
 
     def ensure_loaded(self) -> None:
         if not self._loaded:
-            self.load()
-            self._loaded = True
+            try:
+                self.load()
+                self._loaded = True
+                _log.info("[NER] loaded %s", self.model_id or type(self).__name__)
+            except Exception:
+                _log.exception("[NER] FAILED to load %s — will be skipped", self.model_id or type(self).__name__)
+                raise
 
     def predict(self, text: str) -> list[Entity]:
         self.ensure_loaded()
@@ -63,123 +75,37 @@ SCISPACY_MAP = {
 
 
 # ── GLiNER zero-shot labels + reverse map to schema types ─────────────────────
-GLINER_LABELS = [
-    "gene", "protein", "RNA transcript or mRNA isoform", "exon",
-    "non-coding RNA such as miRNA lncRNA or circRNA",
-    "genomic variant or SNP", "sequence variant or point mutation",
-    "structural variant such as CNV deletion or translocation",
-    "regulatory region", "enhancer element", "super-enhancer",
-    "gene promoter", "transcription factor binding site",
-    "epigenomic feature such as histone mark or methylation",
-    "sequence motif or transcription factor motif",
-    "topologically associating domain TAD",
-    "small molecule drug or metabolite",
-    "molecular interaction or protein-protein interaction",
-    "macromolecular complex",
-    "haplotype", "genotype",
-    "disease", "cancer or tumour type",
-    "phenotype", "clinical symptom",
-    "biological pathway",
-    "biochemical reaction",
-    "biological process",
-    "molecular function",
-    "cellular component or organelle",
-    "anatomical structure",
-    "tissue type",
-    "cell type",
-    "cell line",
-    "developmental stage or life stage",
-    "experimental condition or treatment",
-    "3D genome structure or chromatin loop",
-    "organism or species",
-]
-
-GLINER_MAP = {
-    "gene": "GENE",
-    "protein": "PROTEIN",
-    "RNA transcript or mRNA isoform": "TRANSCRIPT",
-    "exon": "EXON",
-    "non-coding RNA such as miRNA lncRNA or circRNA": "NON_CODING_RNA",
-    "genomic variant or SNP": "GENOMIC_VARIANT",
-    "sequence variant or point mutation": "SEQUENCE_VARIANT",
-    "structural variant such as CNV deletion or translocation": "STRUCTURAL_VARIANT",
-    "regulatory region": "REGULATORY_REGION",
-    "enhancer element": "ENHANCER",
-    "super-enhancer": "SUPER_ENHANCER",
-    "gene promoter": "PROMOTER",
-    "transcription factor binding site": "TRANSCRIPTION_FACTOR_BINDING_SITE",
-    "epigenomic feature such as histone mark or methylation": "EPIGENOMIC_FEATURE",
-    "sequence motif or transcription factor motif": "MOTIF",
-    "topologically associating domain TAD": "TAD",
-    "small molecule drug or metabolite": "SMALL_MOLECULE",
-    "molecular interaction or protein-protein interaction": "MOLECULAR_INTERACTION",
-    "macromolecular complex": "MACROMOLECULAR_COMPLEX",
-    "haplotype": "HAPLOTYPE",
-    "genotype": "GENOTYPE",
-    "disease": "DISEASE",
-    "cancer or tumour type": "CANCER",
-    "phenotype": "PHENOTYPE",
-    "clinical symptom": "SYMPTOM",
-    "biological pathway": "PATHWAY",
-    "biochemical reaction": "REACTION",
-    "biological process": "BIOLOGICAL_PROCESS",
-    "molecular function": "MOLECULAR_FUNCTION",
-    "cellular component or organelle": "CELLULAR_COMPONENT",
-    "anatomical structure": "ANATOMY",
-    "tissue type": "TISSUE",
-    "cell type": "CELL_TYPE",
-    "cell line": "CELL_LINE",
-    "developmental stage or life stage": "DEVELOPMENTAL_STAGE",
-    "experimental condition or treatment": "EXPERIMENTAL_FACTOR",
-    "3D genome structure or chromatin loop": "THREE_D_GENOME_STRUCTURE",
-    "organism or species": "ORGANISM",
-}
+# (imported from taxonomy.py above — single source of truth)
 
 
-# ── GLiNER-BioMed Large (cross-encoder) ───────────────────────────────────────
-class _GLiNERLarge(_BaseNERModel):
+# ── GLiNER shared base (Large and Base differ only in model_id) ───────────────
+class _GLiNERBaseModel(_BaseNERModel):
+    _THRESHOLD = 0.5
+
+    def load(self) -> None:
+        import torch
+        from gliner import GLiNER
+        self._model = GLiNER.from_pretrained(self.model_id)
+        if torch.cuda.is_available():
+            self._model = self._model.to("cuda")
+
+    def _predict(self, text: str) -> list[Entity]:
+        ents = self._model.predict_entities(
+            text, GLINER_LABELS, threshold=self._THRESHOLD, flat_ner=True
+        )
+        return [
+            Entity(e["start"], e["end"], e["text"],
+                   GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0))
+            for e in ents
+        ]
+
+
+class _GLiNERLarge(_GLiNERBaseModel):
     model_id = "Ihor/gliner-biomed-large-v1.0"
-    _THRESHOLD = 0.5
-
-    def load(self) -> None:
-        import torch
-        from gliner import GLiNER
-        self._model = GLiNER.from_pretrained(self.model_id)
-        if torch.cuda.is_available():
-            self._model = self._model.to("cuda")
-
-    def _predict(self, text: str) -> list[Entity]:
-        ents = self._model.predict_entities(
-            text, GLINER_LABELS, threshold=self._THRESHOLD, flat_ner=True
-        )
-        return [
-            Entity(e["start"], e["end"], e["text"],
-                   GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0))
-            for e in ents
-        ]
 
 
-# ── GLiNER-BioMed Base (smaller/faster cross-encoder) ─────────────────────────
-class _GLiNERBase(_BaseNERModel):
+class _GLiNERSmall(_GLiNERBaseModel):
     model_id = "Ihor/gliner-biomed-base-v1.0"
-    _THRESHOLD = 0.5
-
-    def load(self) -> None:
-        import torch
-        from gliner import GLiNER
-        self._model = GLiNER.from_pretrained(self.model_id)
-        if torch.cuda.is_available():
-            self._model = self._model.to("cuda")
-
-    def _predict(self, text: str) -> list[Entity]:
-        ents = self._model.predict_entities(
-            text, GLINER_LABELS, threshold=self._THRESHOLD, flat_ner=True
-        )
-        return [
-            Entity(e["start"], e["end"], e["text"],
-                   GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0))
-            for e in ents
-        ]
 
 
 # ── Stanza BioNLP13CG (CharLM + BiLSTM + CRF) ─────────────────────────────────
@@ -238,10 +164,10 @@ def get_gliner_large() -> _GLiNERLarge:
     return _GLINER_LARGE
 
 
-def get_gliner_base() -> _GLiNERBase:
+def get_gliner_base() -> _GLiNERSmall:
     global _GLINER_BASE
     if _GLINER_BASE is None:
-        _GLINER_BASE = _GLiNERBase()
+        _GLINER_BASE = _GLiNERSmall()
     return _GLINER_BASE
 
 

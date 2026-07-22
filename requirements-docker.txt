@@ -8,6 +8,8 @@ pydantic
 instructor==0.4.8
 spacy==3.7.5
 scispacy
+gliner
+stanza
 python-dotenv
 rich
 fastapi

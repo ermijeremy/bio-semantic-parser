@@ -30,6 +30,7 @@ GLiNER models load lazily via singleton registry on first predict.
 """
 from __future__ import annotations
 
+import logging
 import os
 
 import spacy
@@ -43,11 +44,13 @@ from src.preextraction.ner_models import (
 )
 
 from src.preextraction.ner_tagger import NERTagger
+from src.preextraction import hf_ner_tagger
 from src.preextraction.negation_detector import NegationDetector
 from src.preextraction.doi_extractor import DOIExtractor
 from src.preextraction.accession_detector import AccessionDetector
 from src.preextraction.pubtator_client import fetch_pubtator_entities
 
+_log = logging.getLogger(__name__)
 
 # Schema types scispaCy is authoritative on these win over the zero-shot models
 # on span overlap. Any other scispaCy type is demoted to a last-resort gap-filler.
@@ -85,27 +88,22 @@ def _overlaps_any(start: int, end: int, occupied: list[tuple[int, int]]) -> bool
     return any(_char_overlaps(start, end, s, e) for s, e in occupied)
 
 
-def _load_model(env_key: str, default: str):
-    """Load a spaCy model named by env_key, falling back to default. Returns None if empty."""
-    name = os.getenv(env_key, default).strip()
-    if not name:
-        return None
-    try:
-        return spacy.load(name)
-    except OSError:
-        import sys
-        print(f"[NER] Warning: model '{name}' ({env_key}) not found — skipping.", file=sys.stderr)
-        return None
-
-
 class Preextractor:
     """Five-model NER ensemble with lazy, cached model loading."""
 
     def __init__(self):
         # scispaCy expert pipelines (always loaded at init — fast, always run).
-        self._nlp_bc5 = spacy.load("en_ner_bc5cdr_md")       # DISEASE, CHEMICAL
-        self._nlp_jnl = spacy.load("en_ner_jnlpba_md")       # DNA, RNA, PROTEIN, CELL_TYPE, CELL_LINE
-        self._nlp_bio = spacy.load("en_ner_bionlp13cg_md")   # broad bio types
+        for name, attr in [
+            ("en_ner_bc5cdr_md",     "_nlp_bc5"),
+            ("en_ner_jnlpba_md",     "_nlp_jnl"),
+            ("en_ner_bionlp13cg_md", "_nlp_bio"),
+        ]:
+            try:
+                setattr(self, attr, spacy.load(name))
+                _log.info("[NER] loaded scispaCy %s", name)
+            except OSError:
+                _log.exception("[NER] FAILED to load scispaCy %s — ensemble will be incomplete", name)
+                setattr(self, attr, None)
 
         # Stanza + both GLiNER models load lazily on first predict via registry
         # singletons no duplicate instantiation across Preextractor instances.
@@ -121,16 +119,19 @@ class Preextractor:
 
     def _stanza_model(self):
         if self._stanza is None:
+            _log.info("[NER] lazy-loading Stanza BioNLP13CG…")
             self._stanza = _get_stanza()
         return self._stanza
 
     def _gliner_large_model(self):
         if self._gliner_large is None:
+            _log.info("[NER] lazy-loading GLiNER-BioMed Large…")
             self._gliner_large = _get_gliner_large()
         return self._gliner_large
 
     def _gliner_base_model(self):
         if self._gliner_base is None:
+            _log.info("[NER] lazy-loading GLiNER-BioMed Base…")
             self._gliner_base = _get_gliner_base()
         return self._gliner_base
 
@@ -141,16 +142,22 @@ class Preextractor:
         # populated, it is both the char_span factory for every source and the
         # sentence source NegationDetector relies on (doc.sents), so the
         # downstream contract is preserved.
-        doc1 = self._nlp_bc5(text)
-        doc2 = self._nlp_jnl(text)
-        doc3 = self._nlp_bio(text)
+        docs = []
+        for name, nlp in [("bc5cdr", self._nlp_bc5), ("jnlpba", self._nlp_jnl),
+                          ("bionlp13cg", self._nlp_bio)]:
+            if nlp is None:
+                _log.warning("[NER] skipping scispaCy %s — not loaded", name)
+                continue
+            docs.append(nlp(text))
+        if not docs:
+            _log.error("[NER] no scispaCy models loaded — NER ensemble empty")
 
         # Map every raw scispaCy span to a schema type, then split by confidence:
         # specialist types lead the merge; everything else is demoted to a
         # last-resort gap-filler 
         scispacy_specialist: list[Entity] = []
         scispacy_weak:       list[Entity] = []
-        for doc in (doc1, doc2, doc3):
+        for doc in docs:
             for e in doc.ents:
                 label = SCISPACY_MAP.get(e.label_.upper(), "OTHER")
                 ent = Entity(e.start_char, e.end_char, e.text, label, 1.0)
@@ -172,14 +179,21 @@ class Preextractor:
 
         occupied: list[tuple[int, int]] = []
         final_spans = []
+        # Use the first available doc as the char_span factory
+        span_doc = docs[0] if docs else None
         for source_name, ents in sources:
             stage_spans = []
             for ent in ents:
                 if _overlaps_any(ent.start, ent.end, occupied):
                     continue  # an earlier, higher-priority source claimed this region
-                span = doc1.char_span(ent.start, ent.end, label=ent.label,
-                                      alignment_mode="expand")
+                if span_doc is None:
+                    _log.warning("[NER] no doc available for char_span — skipping %r", ent.text)
+                    continue
+                span = span_doc.char_span(ent.start, ent.end, label=ent.label,
+                                         alignment_mode="expand")
                 if span is None:
+                    _log.debug("char_span returned None for %r [%d:%d] from %s",
+                               ent.text, ent.start, ent.end, source_name)
                     continue
                 span._.score  = ent.score
                 span._.source = source_name
@@ -190,10 +204,11 @@ class Preextractor:
 
         # Sources are already mutually non-overlapping (each stage masks against
         # all prior stages), so this final pass only sorts + guards exact dups.
-        doc1.ents = spacy.util.filter_spans(
-            sorted(final_spans, key=lambda s: (s.start_char, -(s.end_char - s.start_char)))
-        )
-        return doc1
+        if span_doc is not None:
+            span_doc.ents = spacy.util.filter_spans(
+                sorted(final_spans, key=lambda s: (s.start_char, -(s.end_char - s.start_char)))
+            )
+        return span_doc
 
     # ── public API ────────────────────────────────────────────────────────────
 
@@ -201,6 +216,13 @@ class Preextractor:
         text        = chunk["text"]
         doc         = self._run_ensemble(text)
         entities    = NERTagger.from_doc(doc)
+
+        # HuggingFace clinical NER — adds PROCEDURE / CLINICAL_INTERVENTION / DRUG /
+        # SYMPTOM / CLINICAL_MEASUREMENT types that no ensemble model covers.
+        if hf_ner_tagger.should_run():
+            hf_entities = hf_ner_tagger.tag_entities(text)
+            if hf_entities:
+                entities = _merge_entities(entities, hf_entities)
 
         doc_id      = chunk.get("document_id", "")
         source_name = chunk.get("source_name", "")
