@@ -56,7 +56,7 @@ _hf_ensure "cross-encoder/nli-MiniLM2-L6-H768" "Negation model (cross-encoder/nl
 echo "  Checking GLiNER model..."
 python -c "
 from gliner import GLiNER
-mid = 'Ihor/gliner-biomed-base-v1.0'
+mid = 'Ihor/gliner-biomed-large-v1.0'
 try:
     GLiNER.from_pretrained(mid)
     print(f'  ✓ {mid} cached')
@@ -65,6 +65,8 @@ except Exception:
     GLiNER.from_pretrained(mid)
     print(f'  ✓ {mid} ready')
 " 2>/dev/null || echo "  ⚠ GLiNER not available — will download at runtime"
+# Previous checkpoint kept for reference:
+# mid = 'Ihor/gliner-biomed-base-v1.0'
 
 # ── Stanza BioNLP13CG model ──────────────────────────────────────────────────
 echo "  Checking Stanza BioNLP13CG model..."

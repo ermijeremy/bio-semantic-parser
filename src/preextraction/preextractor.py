@@ -38,7 +38,8 @@ from spacy.tokens import Span
 
 from src.preextraction.ner_models import (
     Entity, SCISPACY_MAP,
-    get_gliner_base  as _get_gliner_base,
+    get_gliner_large as _get_gliner_large,
+    # get_gliner_base  as _get_gliner_base,
     get_stanza       as _get_stanza,
 )
 
@@ -100,8 +101,9 @@ class Preextractor:
                 setattr(self, attr, None)
 
         # Stanza + GLiNER load lazily on first predict via registry singletons.
-        self._stanza      = None   # Stanza BioNLP13CG
-        self._gliner_base = None   # GLiNER-BioMed Base
+        self._stanza       = None   # Stanza BioNLP13CG
+        self._gliner_large = None   # GLiNER-BioMed Large
+        # self._gliner_base = None   # GLiNER-BioMed Base
 
         self.negation_detector  = NegationDetector()
         self.doi_extractor      = DOIExtractor()
@@ -115,11 +117,17 @@ class Preextractor:
             self._stanza = _get_stanza()
         return self._stanza
 
-    def _gliner_base_model(self):
-        if self._gliner_base is None:
-            _log.info("[NER] lazy-loading GLiNER-BioMed Base…")
-            self._gliner_base = _get_gliner_base()
-        return self._gliner_base
+    def _gliner_large_model(self):
+        if self._gliner_large is None:
+            _log.info("[NER] lazy-loading GLiNER-BioMed Large…")
+            self._gliner_large = _get_gliner_large()
+        return self._gliner_large
+
+    # def _gliner_base_model(self):
+    #     if self._gliner_base is None:
+    #         _log.info("[NER] lazy-loading GLiNER-BioMed Base…")
+    #         self._gliner_base = _get_gliner_base()
+    #     return self._gliner_base
 
     # ── ensemble ──────────────────────────────────────────────────────────────
 
@@ -164,7 +172,8 @@ class Preextractor:
         sources: list[tuple[str, list[Entity]]] = [
             ("scispacy",      scispacy_specialist),
             ("stanza",        self._stanza_model().predict(text)),
-            ("gliner_base",   self._gliner_base_model().predict(text)),
+            ("gliner_large",  self._gliner_large_model().predict(text)),
+            # ("gliner_base",   self._gliner_base_model().predict(text)),
             ("scispacy_weak", scispacy_weak),
         ]
 

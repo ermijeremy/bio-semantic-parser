@@ -135,13 +135,17 @@ class _GLiNERBaseModel(_BaseNERModel):
         return [
             Entity(e["start"] + char_offset, e["end"] + char_offset, e["text"],
                    GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0),
-                   source="gliner_base", source_model=self.model_id)
+                   source=self.model_id.split("/")[-1], source_model=self.model_id)
             for e in ents
         ]
 
 
-class _GLiNERSmall(_GLiNERBaseModel):
-    model_id = "Ihor/gliner-biomed-base-v1.0"
+class _GLiNERLarge(_GLiNERBaseModel):
+    model_id = "Ihor/gliner-biomed-large-v1.0"
+
+
+# class _GLiNERSmall(_GLiNERBaseModel):
+#     model_id = "Ihor/gliner-biomed-base-v1.0"
 
 
 # ── Stanza BioNLP13CG (CharLM + BiLSTM + CRF) ─────────────────────────────────
@@ -189,18 +193,27 @@ class _StanzaBioNLP13CG(_BaseNERModel):
 
 
 # ── singleton accessors ───────────────────────────────────────────────────────
-_GLINER_BASE = None
+_GLINER_LARGE = None
 _STANZA = None
 _singleton_lock = threading.Lock()
 
 
-def get_gliner_base() -> _GLiNERSmall:
-    global _GLINER_BASE
-    if _GLINER_BASE is None:
+def get_gliner_large() -> _GLiNERLarge:
+    global _GLINER_LARGE
+    if _GLINER_LARGE is None:
         with _singleton_lock:
-            if _GLINER_BASE is None:
-                _GLINER_BASE = _GLiNERSmall()
-    return _GLINER_BASE
+            if _GLINER_LARGE is None:
+                _GLINER_LARGE = _GLiNERLarge()
+    return _GLINER_LARGE
+
+
+# def get_gliner_base() -> _GLiNERSmall:
+#     global _GLINER_BASE
+#     if _GLINER_BASE is None:
+#         with _singleton_lock:
+#             if _GLINER_BASE is None:
+#                 _GLINER_BASE = _GLiNERSmall()
+#     return _GLINER_BASE
 
 
 def get_stanza() -> _StanzaBioNLP13CG:
