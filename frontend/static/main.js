@@ -746,28 +746,11 @@ function streamLine(message, kind) {
       const text = textParts.join('|');
       const card = document.createElement('div');
       card.className = 'sl-chunk-card';
-      const LIMIT = 250;
-      const long  = text.length > LIMIT;
-      const shown = long ? text.slice(0, LIMIT).trimEnd() : text;
       card.innerHTML = `
         <span class="cc-num">#${esc(num)}</span>
         <span class="cc-section">${esc(section)}</span>
         <span class="cc-words">${esc(words)}w</span>
-        <span class="cc-text">${esc(shown)}${long
-          ? `<span class="cc-ellipsis">… </span><button type="button" class="cc-toggle">Show more</button>`
-          : ''}</span>`;
-      if (long) {
-        const textEl = card.querySelector('.cc-text');
-        const btn    = card.querySelector('.cc-toggle');
-        const ell    = card.querySelector('.cc-ellipsis');
-        let expanded = false;
-        btn.addEventListener('click', () => {
-          expanded = !expanded;
-          textEl.firstChild.textContent = expanded ? text : shown;
-          if (ell) ell.style.display = expanded ? 'none' : '';
-          btn.textContent = expanded ? 'Show less' : 'Show more';
-        });
-      }
+        <span class="cc-text">${esc(text)}</span>`;
       ll.appendChild(card);
       autoScroll(ll); return;
     }
@@ -786,35 +769,6 @@ function streamLine(message, kind) {
   const div = document.createElement('div');
   const cls = kind || streamClass(message);
   div.className = 'sl-' + cls;
-
-  // Safety net: any very long streamed line is truncated with a Show more toggle,
-  // regardless of which backend layer emitted it (some emit raw chunk/section text).
-  const LINE_LIMIT = 250;
-  if (message.length > LINE_LIMIT) {
-    const shown = message.slice(0, LINE_LIMIT).trimEnd();
-    const span  = document.createElement('span');
-    span.textContent = shown;
-    const ell = document.createElement('span');
-    ell.textContent = '… ';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'cc-toggle';
-    btn.textContent = 'Show more';
-    let expanded = false;
-    btn.addEventListener('click', () => {
-      expanded = !expanded;
-      span.textContent = expanded ? message : shown;
-      ell.style.display = expanded ? 'none' : '';
-      btn.textContent = expanded ? 'Show less' : 'Show more';
-    });
-    div.appendChild(span);
-    div.appendChild(ell);
-    div.appendChild(btn);
-    ll.appendChild(div);
-    autoScroll(ll);
-    return;
-  }
-
   div.textContent = message;
   ll.appendChild(div);
   autoScroll(ll);
@@ -830,8 +784,7 @@ function streamClass(msg) {
   const m = msg.toLowerCase();
   if (m.includes('✓') || m.includes(' ok') || m.startsWith('ok') || m.includes('done') || m.includes('generated') || m.startsWith('  ✓')) return 'ok';
   if (m.includes('coref') || m.includes('rewrite') || m.includes('before :') || m.includes('after :') || m.includes('chain')) return 'coref';
-  if (m.includes('negat') || m.includes('✗ negated') || m.includes('absent')) return 'neg';
-  if (m.includes('entity') || m.includes('entities') || m.includes('(gene)') || m.includes('(protein)')) return 'entity';
+  if (m.includes('entity') || m.includes('negat') || m.includes('(gene)') || m.includes('(protein)') || m.includes('absent')) return 'entity';
   if (m.includes('→') || m.includes('conf:') || m.includes('↗') || m.includes('relation')) return 'rel';
   if (m.includes('warning') || m.includes('skip') || m.includes('fail') || m.startsWith('  ✗')) return 'warn';
   if (m.startsWith('  ') && m.includes(':')) return 'meta';
@@ -1548,9 +1501,7 @@ function r3(d) {
 function r4(d) {
   const pills = (d.entities||[]).slice(0,36).map(e => {
     const cls = 't' + (e.label||'default');
-    const model = e.source_model || e.source || 'unknown';
-    const shortModel = model.includes('/') ? model.split('/').pop() : model;
-    return `<span class="chip" title="Captured by ${esc(model)}"><span class="type ${cls}">${esc(e.label||'?')}</span>${esc(e.text)}<span style="margin-left:6px;padding:1px 6px;border-radius:999px;background:rgba(107,140,190,.14);color:var(--text3);font-size:9px;font-weight:700;line-height:1.4" title="${esc(model)}">${esc(shortModel)}</span>${e.negated?' <span style="color:var(--red);font-size:8px">✗</span>':''}</span>`;
+    return `<span class="chip"><span class="type ${cls}">${esc(e.label||'?')}</span>${esc(e.text)}${e.negated?' <span style="color:var(--red);font-size:8px">✗</span>':''}</span>`;
   }).join('');
   return `<div class="stats">
     <div class="stat"><span class="n n-blue">${d.entity_count}</span> entities</div>
@@ -1817,7 +1768,7 @@ function _refreshVerificationCounter(verified, total) {
   const cnt  = document.getElementById('ver-count');
   const tot  = document.getElementById('ver-total');
   const bar  = document.getElementById('ver-bar');
-  if (arc)  { arc.setAttribute('stroke', clr); arc.setAttribute('stroke-dasharray', `${(pct/100*138.23).toFixed(2)} 138.23`); }
+  if (arc)  { arc.setAttribute('stroke', clr); arc.setAttribute('stroke-dasharray', `${Math.round(pct/100*138.2)} 138.2`); }
   if (ring) { ring.textContent = pct + '%'; ring.style.color = clr; }
   if (cnt)  { cnt.textContent = verified; cnt.style.color = clr; }
   if (tot)  { tot.textContent = ' / ' + total; }
@@ -2112,8 +2063,8 @@ function renderOutput(d) {
             <svg width="54" height="54" viewBox="0 0 54 54">
               <circle cx="27" cy="27" r="22" fill="none" stroke="var(--bg3)" stroke-width="4"/>
               <circle id="ver-arc" cx="27" cy="27" r="22" fill="none" stroke="${_clrHex}" stroke-width="4"
-                stroke-dasharray="${(_pctRaw/100*138.23).toFixed(2)} 138.23"
-                stroke-dashoffset="0" stroke-linecap="round"
+                stroke-dasharray="${Math.round(_pctRaw/100*138.2)} 138.2"
+                stroke-dashoffset="34.6" stroke-linecap="round"
                 transform="rotate(-90 27 27)"/>
             </svg>
             <div id="ver-pct-ring" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
