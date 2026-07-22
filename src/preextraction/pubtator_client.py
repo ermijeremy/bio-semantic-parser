@@ -65,6 +65,7 @@ def fetch_pubtator_entities(pmid: str, timeout: int = 15) -> List[Dict]:
                     "end":        end,
                     "negated":    False,
                     "source":     "pubtator3",
+                    "source_model": "pubtator3",
                 })
 
     return entities

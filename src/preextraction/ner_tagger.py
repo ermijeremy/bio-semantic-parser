@@ -36,6 +36,7 @@ class NERTagger:
 
             ner_confidence = ent._.score  if ent.has_extension("score")  else 1.0
             source         = ent._.source if ent.has_extension("source") else ""
+            source_model   = ent._.source_model if ent.has_extension("source_model") else source
             entities.append({
                 "text":           ent.text,
                 "normalized":     normalized,
@@ -46,6 +47,7 @@ class NERTagger:
                 "assertion":      "PRESENT",
                 "ner_confidence": round(float(ner_confidence), 3),
                 "source":         source,
+                "source_model":   source_model,
                 "confidence":     1.0,
             })
         return entities

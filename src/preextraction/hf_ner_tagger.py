@@ -195,6 +195,7 @@ def tag_entities(text: str) -> list[dict]:
             "ner_confidence": round(score, 3),
             "confidence":     round(score, 3),
             "source":         "hf_ner",
+            "source_model":   model_name,
         })
 
     return entities

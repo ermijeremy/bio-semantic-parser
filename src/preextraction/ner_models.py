@@ -29,6 +29,8 @@ class Entity:
     text: str
     label: str
     score: float = 1.0
+    source: str = ""
+    source_model: str = ""
 
     def as_tuple(self) -> tuple:
         return (self.start, self.end, self.text, self.label)
@@ -132,7 +134,8 @@ class _GLiNERBaseModel(_BaseNERModel):
         )
         return [
             Entity(e["start"] + char_offset, e["end"] + char_offset, e["text"],
-                   GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0))
+                   GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0),
+                   source="gliner_base", source_model=self.model_id)
             for e in ents
         ]
 
@@ -180,7 +183,8 @@ class _StanzaBioNLP13CG(_BaseNERModel):
         out = []
         for ent in doc.ents:
             label = _STANZA_MAP.get(ent.type.upper(), ent.type.upper())
-            out.append(Entity(ent.start_char, ent.end_char, ent.text, label))
+            out.append(Entity(ent.start_char, ent.end_char, ent.text, label,
+                              source="stanza", source_model=self.model_id))
         return out
 
 

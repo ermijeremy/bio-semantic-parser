@@ -22,7 +22,8 @@ merge is a union — priority only decides the winning *type* on overlap.
                             last-resort gap-filler so no recall is lost.
 
 Every span carries its origin model (span._.source) and the model's confidence
-(span._.score); NERTagger surfaces both to the downstream entity dicts.
+(span._.score); NERTagger surfaces both, plus the exact model name in
+span._.source_model, to the downstream entity dicts.
 
 scispaCy models load eagerly in __init__ (fast, always run); Stanza and GLiNER
 load lazily via singleton registry on first predict.
@@ -65,6 +66,8 @@ if not Span.has_extension("score"):
     Span.set_extension("score", default=1.0)
 if not Span.has_extension("source"):
     Span.set_extension("source", default="")
+if not Span.has_extension("source_model"):
+    Span.set_extension("source_model", default="")
 
 
 # ── merge helpers ─────────────────────────────────────────────────────────────
@@ -126,12 +129,15 @@ class Preextractor:
         # sentence source NegationDetector relies on (doc.sents), so the
         # downstream contract is preserved.
         docs = []
-        for name, nlp in [("bc5cdr", self._nlp_bc5), ("jnlpba", self._nlp_jnl),
-                          ("bionlp13cg", self._nlp_bio)]:
+        for name, model_name, nlp in [
+            ("bc5cdr", "en_ner_bc5cdr_md", self._nlp_bc5),
+            ("jnlpba", "en_ner_jnlpba_md", self._nlp_jnl),
+            ("bionlp13cg", "en_ner_bionlp13cg_md", self._nlp_bio),
+        ]:
             if nlp is None:
                 _log.warning("[NER] skipping scispaCy %s — not loaded", name)
                 continue
-            docs.append(nlp(text))
+            docs.append((name, model_name, nlp(text)))
         if not docs:
             _log.error("[NER] no scispaCy models loaded — NER ensemble empty")
 
@@ -140,10 +146,13 @@ class Preextractor:
         # last-resort gap-filler 
         scispacy_specialist: list[Entity] = []
         scispacy_weak:       list[Entity] = []
-        for doc in docs:
+        for _, model_name, doc in docs:
             for e in doc.ents:
                 label = SCISPACY_MAP.get(e.label_.upper(), "OTHER")
-                ent = Entity(e.start_char, e.end_char, e.text, label, 1.0)
+                ent = Entity(
+                    e.start_char, e.end_char, e.text, label, 1.0,
+                    source="scispacy", source_model=model_name,
+                )
                 if label in _SCISPACY_SPECIALIST:
                     scispacy_specialist.append(ent)
                 else:
@@ -162,7 +171,7 @@ class Preextractor:
         occupied: list[tuple[int, int]] = []
         final_spans = []
         # Use the first available doc as the char_span factory
-        span_doc = docs[0] if docs else None
+        span_doc = docs[0][2] if docs else None
         for source_name, ents in sources:
             stage_spans = []
             for ent in ents:
@@ -180,6 +189,7 @@ class Preextractor:
                     continue
                 span._.score  = ent.score
                 span._.source = source_name
+                span._.source_model = ent.source_model or ent.source or source_name
                 stage_spans.append(span)
             stage_spans = spacy.util.filter_spans(stage_spans)
             final_spans.extend(stage_spans)
