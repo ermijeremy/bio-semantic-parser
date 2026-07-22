@@ -182,7 +182,7 @@ async def start_test_run():
         log(4, "Running NLI negation detector on 42 entities…")
         log(4, '  "failed to activate mTOR" → mTOR ABSENT (contradiction score: 0.87)')
         _time.sleep(0.4)
-        _emit({"layer":4,"status":"done","message":"42 entities tagged","data":{"entity_count":42,"negated_count":3,"entity_types":["GENE","PROTEIN","DISEASE","CHEMICAL","ORGANISM"],"entities":[{"text":"BRCA1","label":"GENE","negated":False,"source":"scispacy","source_model":"en_ner_bc5cdr_md"},{"text":"rapamycin","label":"CHEMICAL","negated":False,"source":"gliner_base","source_model":"Ihor/gliner-biomed-base-v1.0"},{"text":"mTOR","label":"GENE","negated":True,"source":"stanza","source_model":"stanza:en/bionlp13cg"}]}})
+        _emit({"layer":4,"status":"done","message":"42 entities tagged","data":{"entity_count":42,"negated_count":3,"entity_types":["GENE","PROTEIN","DISEASE","CHEMICAL","ORGANISM"],"entities":[{"text":"BRCA1","label":"GENE","negated":False,"source":"scispacy","source_model":"en_ner_bc5cdr_md"},{"text":"rapamycin","label":"CHEMICAL","negated":False,"source":"gliner_large","source_model":"Ihor/gliner-biomed-large-v1.0"},{"text":"mTOR","label":"GENE","negated":True,"source":"stanza","source_model":"stanza:en/bionlp13cg"}]}})
 
         _emit({"layer":5,"status":"running","message":"Loading schema…","data":{}})
         log(5, "Loading RelationType enum: 87 types in 22 categories")

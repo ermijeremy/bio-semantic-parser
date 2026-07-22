@@ -122,6 +122,7 @@ def tag_entities(text: str) -> list[dict]:
         return []
 
     threshold = float(os.getenv("HF_NER_THRESHOLD", "0.80"))
+    model_name = os.getenv("HF_NER_MODEL", "d4data/biomedical-ner-all")
 
     try:
         pipe    = _get_pipeline()

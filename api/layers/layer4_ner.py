@@ -29,11 +29,10 @@ def run_layer4(emit, doc_id, _safe_id, chunks, _completed_layers):
     _pre(emit, 4)
     _emit(emit, 4, "running", "Tagging entities and detecting negation…")
     try:
-        _m_names = [os.getenv(f"NER_MODEL_{i}", "").split("en_ner_")[-1].replace("_md", "").upper()
-                    for i in range(1, 9) if os.getenv(f"NER_MODEL_{i}", "").strip()]
-        _hf_name = (os.getenv("HF_NER_MODEL", "")
-                    if os.getenv("HF_NER_ENABLED", "true").lower() == "true" else "")
-        _all_names = " · ".join(_m_names + ([_hf_name.split("/")[-1]] if _hf_name else []))
+        _sc_names  = "BC5CDR · JNLPBA · BioNLP13CG · GLiNER-Large · Stanza"
+        _hf_name   = (os.getenv("HF_NER_MODEL", "d4data/biomedical-ner-all").split("/")[-1]
+                      if os.getenv("HF_NER_ENABLED", "true").lower() == "true" else "")
+        _all_names = _sc_names + (f" · {_hf_name}" if _hf_name else "")
         _log(emit, 4, f"Loading NER models: {_all_names}…")
 
         if _utils._preextractor is None:
