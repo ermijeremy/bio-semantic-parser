@@ -2,8 +2,8 @@
 Layer 4 — Self-contained NER model definitions
 
 Everything the Preextractor ensemble needs: the Entity span dataclass, the
-scispaCy label→schema map, and the three lazily-loaded models
-(GLiNER-BioMed Large/Base, Stanza BioNLP13CG).
+scispaCy label→schema map, and the two lazily-loaded models
+(GLiNER-BioMed Base, Stanza BioNLP13CG).
 
 GLiNER zero-shot labels and the label→schema map live in taxonomy.py
 (single source of truth).
@@ -80,6 +80,21 @@ SCISPACY_MAP = {
 
 
 # ── GLiNER shared base (Large and Base differ only in model_id) ───────────────
+_GLINER_MAX_TOKENS = 1800  # safe margin below 2048 hard limit
+
+
+def _split_sentences(text: str) -> list[tuple[str, int]]:
+    """Split text into (sentence, char_offset) pairs."""
+    import re
+    parts = re.split(r'(?<=[.!?])\s+', text)
+    result = []
+    offset = 0
+    for part in parts:
+        result.append((part, offset))
+        offset += len(part) + 1  # +1 for the space
+    return result
+
+
 class _GLiNERBaseModel(_BaseNERModel):
     _THRESHOLD = 0.5
 
@@ -91,18 +106,35 @@ class _GLiNERBaseModel(_BaseNERModel):
             self._model = self._model.to("cuda")
 
     def _predict(self, text: str) -> list[Entity]:
+        # Estimate token count (~4 chars/token) and chunk if too long
+        if len(text) <= _GLINER_MAX_TOKENS * 4:
+            return self._predict_chunk(text, 0)
+
+        sentences = _split_sentences(text)
+        all_ents: list[Entity] = []
+        chunk, chunk_offset = "", 0
+        for sent, sent_offset in sentences:
+            if not chunk:
+                chunk_offset = sent_offset
+            candidate = (chunk + " " + sent).strip() if chunk else sent
+            if len(candidate) > _GLINER_MAX_TOKENS * 4 and chunk:
+                all_ents.extend(self._predict_chunk(chunk, chunk_offset))
+                chunk, chunk_offset = sent, sent_offset
+            else:
+                chunk = candidate
+        if chunk:
+            all_ents.extend(self._predict_chunk(chunk, chunk_offset))
+        return all_ents
+
+    def _predict_chunk(self, text: str, char_offset: int) -> list[Entity]:
         ents = self._model.predict_entities(
             text, GLINER_LABELS, threshold=self._THRESHOLD, flat_ner=True
         )
         return [
-            Entity(e["start"], e["end"], e["text"],
+            Entity(e["start"] + char_offset, e["end"] + char_offset, e["text"],
                    GLINER_MAP.get(e["label"], "OTHER"), e.get("score", 1.0))
             for e in ents
         ]
-
-
-class _GLiNERLarge(_GLiNERBaseModel):
-    model_id = "Ihor/gliner-biomed-large-v1.0"
 
 
 class _GLiNERSmall(_GLiNERBaseModel):
@@ -153,19 +185,9 @@ class _StanzaBioNLP13CG(_BaseNERModel):
 
 
 # ── singleton accessors ───────────────────────────────────────────────────────
-_GLINER_LARGE = None
 _GLINER_BASE = None
 _STANZA = None
 _singleton_lock = threading.Lock()
-
-
-def get_gliner_large() -> _GLiNERLarge:
-    global _GLINER_LARGE
-    if _GLINER_LARGE is None:
-        with _singleton_lock:
-            if _GLINER_LARGE is None:
-                _GLINER_LARGE = _GLiNERLarge()
-    return _GLINER_LARGE
 
 
 def get_gliner_base() -> _GLiNERSmall:

@@ -4,7 +4,7 @@ Layer 4 — Pre-Extraction Orchestrator
 Five-model NER ensemble merged into a single span set. All spans from every
 source are kept; on span overlap the earlier source in the ordered list wins.
 
-these entities feed the Layer 6 LLM, which can only build
+These entities feed the Layer 6 LLM, which can only build
 relations from pre-tagged entities (a missed span is a lost relation), so the
 merge is a union — priority only decides the winning *type* on overlap.
 
@@ -13,11 +13,10 @@ merge is a union — priority only decides the winning *type* on overlap.
   1. scispaCy specialists — the 3 expert pipelines (BC5CDR, JNLPBA, BioNLP13CG),
      restricted to the types they are authoritative on: DISEASE, SMALL_MOLECULE,
      GENE, PROTEIN, CELL_TYPE, CELL_LINE, CANCER, NON_CODING_RNA.
-  2. GLiNER-BioMed Large  — highest-F1 zero-shot model (~0.88), broadest coverage.
-  3. Stanza BioNLP13CG    — CharLM+BiLSTM+CRF; anatomy / organism / tissue breadth.
-  4. GLiNER-BioMed Base   — lighter zero-shot sweep (lower threshold) to recover
+  2. Stanza BioNLP13CG    — CharLM+BiLSTM+CRF; anatomy / organism / tissue breadth.
+  3. GLiNER-BioMed Base   — zero-shot sweep to recover
                             borderline spans the larger models missed.
-  5. scispaCy weak spans  — scispaCy spans whose mapped type is NOT a specialist
+  4. scispaCy weak spans  — scispaCy spans whose mapped type is NOT a specialist
                             type (its shakier anatomy/organism guesses). Demoted
                             below the zero-shot models but still emitted as a
                             last-resort gap-filler so no recall is lost.
@@ -25,8 +24,8 @@ merge is a union — priority only decides the winning *type* on overlap.
 Every span carries its origin model (span._.source) and the model's confidence
 (span._.score); NERTagger surfaces both to the downstream entity dicts.
 
-scispaCy models load eagerly in __init__ (fast, always run); Stanza and the two
-GLiNER models load lazily via singleton registry on first predict.
+scispaCy models load eagerly in __init__ (fast, always run); Stanza and GLiNER
+load lazily via singleton registry on first predict.
 """
 from __future__ import annotations
 
@@ -38,7 +37,6 @@ from spacy.tokens import Span
 
 from src.preextraction.ner_models import (
     Entity, SCISPACY_MAP,
-    get_gliner_large as _get_gliner_large,
     get_gliner_base  as _get_gliner_base,
     get_stanza       as _get_stanza,
 )
@@ -97,11 +95,9 @@ class Preextractor:
                 _log.exception("[NER] FAILED to load scispaCy %s — ensemble will be incomplete", name)
                 setattr(self, attr, None)
 
-        # Stanza + both GLiNER models load lazily on first predict via registry
-        # singletons no duplicate instantiation across Preextractor instances.
-        self._stanza       = None   # Stanza BioNLP13CG
-        self._gliner_large = None   # GLiNER-BioMed Large
-        self._gliner_base  = None   # GLiNER-BioMed Base
+        # Stanza + GLiNER load lazily on first predict via registry singletons.
+        self._stanza      = None   # Stanza BioNLP13CG
+        self._gliner_base = None   # GLiNER-BioMed Base
 
         self.negation_detector  = NegationDetector()
         self.doi_extractor      = DOIExtractor()
@@ -114,12 +110,6 @@ class Preextractor:
             _log.info("[NER] lazy-loading Stanza BioNLP13CG…")
             self._stanza = _get_stanza()
         return self._stanza
-
-    def _gliner_large_model(self):
-        if self._gliner_large is None:
-            _log.info("[NER] lazy-loading GLiNER-BioMed Large…")
-            self._gliner_large = _get_gliner_large()
-        return self._gliner_large
 
     def _gliner_base_model(self):
         if self._gliner_base is None:
@@ -163,7 +153,6 @@ class Preextractor:
         # thresholds live in their own modules and are reached via .predict().
         sources: list[tuple[str, list[Entity]]] = [
             ("scispacy",      scispacy_specialist),
-            ("gliner_large",  self._gliner_large_model().predict(text)),
             ("stanza",        self._stanza_model().predict(text)),
             ("gliner_base",   self._gliner_base_model().predict(text)),
             ("scispacy_weak", scispacy_weak),
