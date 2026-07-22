@@ -46,6 +46,7 @@ from src.preextraction import hf_ner_tagger
 from src.preextraction.negation_detector import NegationDetector
 from src.preextraction.doi_extractor import DOIExtractor
 from src.preextraction.accession_detector import AccessionDetector
+from src.preextraction.entity_validator import validate_entities
 from src.preextraction.pubtator_client import fetch_pubtator_entities
 
 _log = logging.getLogger(__name__)
@@ -213,6 +214,9 @@ class Preextractor:
             pt_entities = fetch_pubtator_entities(doc_id)
             if pt_entities:
                 entities = _merge_entities(entities, pt_entities)
+
+        # LLM entity validation — shorten long spans, refine vague ones
+        entities = validate_entities(entities, text)
 
         negation   = self.negation_detector.process(entities, doc)
         doi        = self.doi_extractor.extract(text)

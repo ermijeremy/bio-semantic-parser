@@ -2,6 +2,7 @@ from __future__ import annotations
 """Layer 6 — LLM extraction engine. Builds prompts, calls Gemma, validates via Pydantic."""
 import concurrent.futures
 import json
+import logging
 import os
 import re
 import time
@@ -59,11 +60,13 @@ Required JSON output format — return ONLY this structure, nothing else:
   "relations": [
     {
       "extraction_viable": true,
-      "subject_name":  "<verbatim entity text>",
-      "subject_type":  "<EntityType value>",
-      "relation":      "<RelationType value>",
-      "object_name":   "<verbatim entity text>",
-      "object_type":   "<EntityType value>",
+      "subject_name":      "<verbatim entity text from pre-tagged list>",
+      "subject_type":      "<EntityType value>",
+      "subject_canonical": "<specific biomedical term, or empty string>",
+      "relation":          "<RelationType value>",
+      "object_name":       "<verbatim entity text from pre-tagged list>",
+      "object_type":       "<EntityType value>",
+      "object_canonical":  "<specific biomedical term, or empty string>",
       "negated":       false,
       "confidence":    0.0,
       "reasoning":     "<min 50 chars — why this relation type, alternatives considered, verbatim supporting text>",
@@ -137,6 +140,11 @@ def _system_prompt() -> str:
         "   If a relation involves entities NOT in the pre-tagged list, set extraction_viable=false. "
         "   Use the exact verbatim text as it appears in the list. "
         "   Do NOT add species prefixes ('mammalian', 'human') unless the text says so.\n"
+        "3b. subject_canonical and object_canonical: leave both as empty strings in all normal cases. "
+        "   Fill one ONLY if the corresponding verbatim entity is too vague to be a meaningful "
+        "   standalone biomedical concept (e.g. 'main branch', 'the region', 'this vessel'). "
+        "   When filled, provide the specific biomedical term the text supports (1–3 words, "
+        "   e.g. 'left anterior descending artery'). Never fill these for well-defined entities.\n"
         "4. Produce exactly one JSON object per distinct subject–relation–object triple. "
         "   Do not merge different triples into one.\n"
         "5. Return ONLY the JSON — no explanation, no markdown fences, no extra text."
@@ -216,6 +224,43 @@ def _is_truncation_error(error: str) -> bool:
     ]
     return any(s.lower() in error.lower() for s in truncation_signals)
 
+_clog = logging.getLogger(__name__)
+
+
+def _apply_canonical(relations: list) -> list:
+    """
+    Rewrite subject_name/object_name with their canonical forms where the LLM
+    flagged a pre-tagged entity as too vague. Builds a verbatim→canonical map
+    across all relations in the chunk so every mention is updated consistently.
+    """
+    canonical_map: dict[str, str] = {}
+    for r in relations:
+        if r.subject_canonical:
+            canonical_map[r.subject_name] = r.subject_canonical
+        if r.object_canonical:
+            canonical_map[r.object_name] = r.object_canonical
+
+    if not canonical_map:
+        return relations
+
+    updated = []
+    for r in relations:
+        subj_canon = canonical_map.get(r.subject_name, "")
+        obj_canon  = canonical_map.get(r.object_name, "")
+        if not subj_canon and not obj_canon:
+            updated.append(r)
+            continue
+        data = r.model_dump()
+        if subj_canon:
+            _clog.info("[canonical] %r → %r (subject)", r.subject_name, subj_canon)
+            data["subject_name"] = subj_canon
+        if obj_canon:
+            _clog.info("[canonical] %r → %r (object)", r.object_name, obj_canon)
+            data["object_name"] = obj_canon
+        updated.append(BiologicalRelation(**data))
+    return updated
+
+
 def _split_chunk(chunk: dict) -> list:
     """Split a chunk's text in half at a sentence boundary, returning two sub-chunks (with other metadata)."""
     text = chunk.get("text", "")
@@ -290,6 +335,7 @@ def extract(chunk: dict, _depth: int = 0) -> ExtractionResult:
             data          = _parse_json(last_raw)
             raw_relations = data.get("relations", [data])
             relations     = [BiologicalRelation(**r) for r in raw_relations]
+            relations     = _apply_canonical(relations)
             return ExtractionResult(relations=relations)
 
         except (json.JSONDecodeError, ValidationError, KeyError, TypeError) as exc:

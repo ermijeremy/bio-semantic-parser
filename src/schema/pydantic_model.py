@@ -62,6 +62,25 @@ class BiologicalRelation(BaseModel):
         description="Entity type of the object — must match the Layer 4 entity type tag."
     )
 
+    # Canonical overrides — set when a pre-tagged entity is too vague to stand alone
+    subject_canonical: str = Field(
+        default="",
+        description=(
+            "Leave empty unless the verbatim subject_name is too vague to be a meaningful "
+            "standalone biomedical entity (e.g. 'main branch', 'the region', 'this area'). "
+            "If vague, put the specific biomedical term the text supports here (1–3 words). "
+            "Do NOT use for normal entities — verbatim is preferred."
+        )
+    )
+    object_canonical: str = Field(
+        default="",
+        description=(
+            "Leave empty unless the verbatim object_name is too vague to be a meaningful "
+            "standalone biomedical entity. If vague, put the specific biomedical term here. "
+            "Do NOT use for normal entities — verbatim is preferred."
+        )
+    )
+
     # Negation
     negated: bool = Field(
         default=False,
