@@ -282,7 +282,7 @@ def process(
     log("Step 6 — Semantic Validation")
     from src.postextraction.semantic_validation import _BATCH_SIZE, _BATCH_WORKERS, validate_batch as _vbatch
     log(f"  Batch size: {_BATCH_SIZE} relations/call  ·  Workers: {_BATCH_WORKERS} parallel calls")
-    log("  Each batch checks 5 dimensions: subject · object · relation · negation · support")
+    log("  Each batch checks 6 dimensions: subject · object · relation · negation · support · biomedical relevance")
 
     # Pair records with their chunk-specific source texts
     active = [r for r in records if not r.get("is_contradiction")]
@@ -354,11 +354,12 @@ def process(
                 issues_by_dim[dim_name.lower()] = desc
         detail(name)
         dim_map = [
-            ("val_subject_correct",  "subject  "),
-            ("val_object_correct",   "object   "),
-            ("val_relation_correct", "relation "),
-            ("val_negation_correct", "negation "),
-            ("val_support_strong",   "support  "),
+            ("val_subject_correct",   "subject  "),
+            ("val_object_correct",    "object   "),
+            ("val_relation_correct",  "relation "),
+            ("val_negation_correct",  "negation "),
+            ("val_support_strong",    "support  "),
+            ("val_biomedical_relevant", "biomedical"),
         ]
         for key, label in dim_map:
             ok     = result.get(key, True)

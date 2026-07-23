@@ -64,7 +64,19 @@ TAXONOMY DEFINITION FOR '{relation}':
 LAYER 6 REASONING (what the extraction LLM said):
 {reasoning_from_layer6}
 
-TASK: Verify this extraction across 5 dimensions. For each, answer true/false and explain.
+TASK: Verify this extraction across 6 dimensions. For each, answer true/false and explain.
+
+BIOMEDICAL RELEVANCE CHECK — THIS IS CRITICAL:
+  Both subject AND object MUST be biomedical entities. The following are NOT biomedical:
+  - App metrics: downloads, ratings, installs, page views, users, sessions, retention
+  - Software/tech: app, website, platform, API, database, model, algorithm
+  - Business: revenue, price, cost, market, sales, profit
+  - General concepts: data, information, metadata, content, feature, version
+  - Research meta: paper, study, dataset, sample size, methodology (as subject/object)
+  Also check the LAYER 6 REASONING above: if the reasoning describes a non-biomedical
+  relationship (e.g. "downloads correlate with ratings"), the extraction is NOT valid
+  even if the entities happen to have biomedical names.
+  If ANY of subject, object, or reasoning is non-biomedical → biomedical_relevant=false.
 
 Return ONLY this JSON:
 {{
@@ -83,15 +95,18 @@ Return ONLY this JSON:
   "support_strong": true | false,
   "support_issue": "<empty string if strong support — e.g. 'this is a background claim in Introduction, not a result'>",
 
+  "biomedical_relevant": true | false,
+  "biomedical_issue": "<empty string if both subject and object are biomedical AND the reasoning describes a biomedical relationship. If EITHER entity is non-biomedical (downloads, ratings, users, app, website, etc.) OR the reasoning describes a non-biomedical relationship, set false and explain>",
+
   "verdict": "VALID" | "REVIEW" | "REJECT",
   "verdict_reasoning": "<1-3 sentences explaining the overall verdict>",
   "suggested_correction": "<if REJECT or REVIEW: what the correct extraction should be, else empty string>"
 }}
 
 VERDICT RULES:
-  VALID  — all 5 dimensions correct
-  REVIEW — 1-2 issues, extraction is plausible but needs human confirmation
-  REJECT — 3+ issues, or wrong direction, or hallucinated entity, or complete mismatch
+  VALID  — all 6 dimensions correct AND biomedical_relevant=true
+  REVIEW — 1-2 issues, extraction is plausible but needs human confirmation. AUTOMATICALLY REVIEW if biomedical_relevant=false
+  REJECT — 3+ issues, or wrong direction, or hallucinated entity, or complete mismatch, or biomedical_relevant=false with other issues
 """
 
     return [
@@ -143,9 +158,19 @@ def validate(record: dict, source_text: str) -> dict:
             if issue_text:
                 issues.append(f"{dim.upper()}: {issue_text}")
 
+    # Biomedical relevance — non-biomedical entities always force REVIEW
+    if not data.get("biomedical_relevant", True):
+        bio_issue = data.get("biomedical_issue", "")
+        issues.append(f"BIOMEDICAL_RELEVANCE: {bio_issue}" if bio_issue else "BIOMEDICAL_RELEVANCE: subject or object is not a biomedical entity")
+
     # ── Update record ─────────────────────────────────────────────
     flagged       = record.get("flagged_for_review", False)
     review_reason = record.get("review_reason", "")
+
+    # Force REVIEW if either entity lacks biomedical relevance
+    non_biomedical = not data.get("biomedical_relevant", True)
+    if non_biomedical and verdict == "VALID":
+        verdict = "REVIEW"
 
     if verdict in ("REVIEW", "REJECT"):
         flagged = True
@@ -158,12 +183,13 @@ def validate(record: dict, source_text: str) -> dict:
 
     return {
         **record,
-        # Five dimension results
+        # Six dimension results
         "val_subject_correct":    data.get("subject_correct",  True),
         "val_object_correct":     data.get("object_correct",   True),
         "val_relation_correct":   data.get("relation_correct", True),
         "val_negation_correct":   data.get("negation_correct", True),
         "val_support_strong":     data.get("support_strong",   True),
+        "val_biomedical_relevant": data.get("biomedical_relevant", True),
         # Overall verdict
         "validation_verdict":     verdict,
         "validation_reasoning":   reasoning,
@@ -205,6 +231,15 @@ def _build_batch_prompt(items: list) -> list:
     user = (
         "SOURCE TEXT (all relations below were extracted from this same chunk of text):\n"
         f"\"{shared_source}\"\n\n"
+        "BIOMEDICAL RELEVANCE RULE — CRITICAL:\n"
+        "  Both subject AND object MUST be biomedical entities (genes, proteins, chemicals,\n"
+        "  diseases, organisms, tissues, cell types, drugs, phenotypes, biological processes).\n"
+        "  The following are NOT biomedical: downloads, ratings, installs, page views, users,\n"
+        "  sessions, app, website, platform, API, revenue, price, data, metadata, feature,\n"
+        "  paper, study, dataset, methodology (as subject/object).\n"
+        "  Also check the REASONING: if it describes a non-biomedical relationship\n"
+        "  (e.g. 'downloads correlate with ratings'), the extraction is NOT valid.\n"
+        "  If ANY of subject, object, or reasoning is non-biomedical → biomedical_relevant=false.\n\n"
         "Validate each of the following relations against the SOURCE TEXT above.\n"
         "For each relation return one JSON object in a top-level 'results' array.\n\n"
         + "\n\n".join(blocks)
@@ -217,6 +252,7 @@ def _build_batch_prompt(items: list) -> list:
         "      \"relation_correct\": true|false, \"relation_issue\": \"\",\n"
         "      \"negation_correct\": true|false, \"negation_issue\": \"\",\n"
         "      \"support_strong\": true|false, \"support_issue\": \"\",\n"
+        "      \"biomedical_relevant\": true|false, \"biomedical_issue\": \"\",\n"
         "      \"verdict\": \"VALID\"|\"REVIEW\"|\"REJECT\",\n"
         "      \"verdict_reasoning\": \"...\",\n"
         "      \"suggested_correction\": \"\"\n"
@@ -250,8 +286,19 @@ def _apply_verdict(record: dict, data: dict) -> dict:
             if issue_text:
                 issues.append(f"{dim.upper()}: {issue_text}")
 
+    # Biomedical relevance — non-biomedical entities always force REVIEW
+    if not data.get("biomedical_relevant", True):
+        bio_issue = data.get("biomedical_issue", "")
+        issues.append(f"BIOMEDICAL_RELEVANCE: {bio_issue}" if bio_issue else "BIOMEDICAL_RELEVANCE: subject or object is not a biomedical entity")
+
     flagged       = record.get("flagged_for_review", False)
     review_reason = record.get("review_reason", "")
+
+    # Force REVIEW if either entity lacks biomedical relevance
+    non_biomedical = not data.get("biomedical_relevant", True)
+    if non_biomedical and verdict == "VALID":
+        verdict = "REVIEW"
+
     if verdict in ("REVIEW", "REJECT"):
         flagged = True
         new_reason = f"SEMANTIC_{verdict}: {reasoning}"
@@ -268,6 +315,7 @@ def _apply_verdict(record: dict, data: dict) -> dict:
         "val_relation_correct":   data.get("relation_correct", True),
         "val_negation_correct":   data.get("negation_correct", True),
         "val_support_strong":     data.get("support_strong",   True),
+        "val_biomedical_relevant": data.get("biomedical_relevant", True),
         "validation_verdict":     verdict,
         "validation_reasoning":   reasoning,
         "suggested_correction":   correction,

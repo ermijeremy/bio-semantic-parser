@@ -1,7 +1,8 @@
-from __future__ import annotations
 """Layer 6 — LLM extraction engine. Builds prompts, calls Gemma, validates via Pydantic."""
+from __future__ import annotations
 import concurrent.futures
 import json
+import logging
 import os
 import re
 import time
@@ -59,11 +60,11 @@ Required JSON output format — return ONLY this structure, nothing else:
   "relations": [
     {
       "extraction_viable": true,
-      "subject_name":  "<verbatim entity text>",
-      "subject_type":  "<EntityType value>",
-      "relation":      "<RelationType value>",
-      "object_name":   "<verbatim entity text>",
-      "object_type":   "<EntityType value>",
+      "subject_name":      "<verbatim entity text from pre-tagged list>",
+      "subject_type":      "<EntityType value>",
+      "relation":          "<RelationType value>",
+      "object_name":       "<verbatim entity text from pre-tagged list>",
+      "object_type":       "<EntityType value>",
       "negated":       false,
       "confidence":    0.0,
       "reasoning":     "<min 50 chars — why this relation type, alternatives considered, verbatim supporting text>",
@@ -139,7 +140,26 @@ def _system_prompt() -> str:
         "   Do NOT add species prefixes ('mammalian', 'human') unless the text says so.\n"
         "4. Produce exactly one JSON object per distinct subject–relation–object triple. "
         "   Do not merge different triples into one.\n"
-        "5. Return ONLY the JSON — no explanation, no markdown fences, no extra text."
+        "5. Return ONLY the JSON — no explanation, no markdown fences, no extra text.\n"
+        "6. BIOMEDICAL RELEVANCE — both subject and object MUST be biomedical entities "
+        "(genes, proteins, chemicals, diseases, organisms, tissues, cell types, drugs, "
+        "phenotypes, biological processes, clinical interventions, anatomical structures). "
+        "The following are NOT biomedical and must be rejected with extraction_viable=false: "
+        "app metrics (downloads, ratings, installs, page views, users, sessions, retention), "
+        "software/tech (app, website, platform, API, database, model, algorithm), "
+        "business (revenue, price, cost, market, sales), "
+        "general concepts (data, information, metadata, content, feature, version), "
+        "research meta (paper, study, dataset, sample size, methodology as subject/object). "
+        "If the text describes a relationship between non-biomedical entities, "
+        "set extraction_viable=false regardless of how biomedical the text sounds.\n"
+        "7. NO DUPLICATE OR NEAR-DUPLICATE RELATIONS — after extracting all relations, "
+        "review your output and remove duplicates before returning. Two relations are "
+        "duplicates if they describe the same biological fact, even with different wording:\n"
+        "   - Same relation with synonymous entity names (e.g. 'sodium intake' ≈ 'sodium', "
+        "'blood pressure' ≈ 'BP')\n"
+        "   - Same direction: 'A activates B' and 'B is activated by A' are duplicates — keep one.\n"
+        "   Keep only the MOST SPECIFIC version (e.g. 'sodium intake' over 'sodium', "
+        "'upregulates' over 'regulates'). If truly uncertain, keep the higher-confidence one.\n"
     )
 
 
@@ -215,6 +235,8 @@ def _is_truncation_error(error: str) -> bool:
         "Expecting property name", "Expecting value", "Extra data",
     ]
     return any(s.lower() in error.lower() for s in truncation_signals)
+
+_clog = logging.getLogger(__name__)
 
 def _split_chunk(chunk: dict) -> list:
     """Split a chunk's text in half at a sentence boundary, returning two sub-chunks (with other metadata)."""
