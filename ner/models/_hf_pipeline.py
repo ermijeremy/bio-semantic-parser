@@ -64,8 +64,10 @@ class HFTokenClassificationModel(BaseNERModel):
     def _predict(self, text: str) -> list[Entity]:
         out = []
         for r in self._pipe(text):
+            start, end = int(r["start"]), int(r["end"])
+            word = text[start:end] if start >= 0 and end <= len(text) else r["word"]
             out.append(Entity(
-                int(r["start"]), int(r["end"]), r["word"],
+                start, end, word,
                 self._map_label(r["entity_group"]), float(r.get("score", 1.0)),
             ))
         return out
