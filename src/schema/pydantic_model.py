@@ -66,9 +66,11 @@ class BiologicalRelation(BaseModel):
     negated: bool = Field(
         default=False,
         description=(
-            "Pass through the negation flag from Layer 4. "
-            "True if Layer 4 marks either entity as NEGATED/ABSENT, or if the relation is explicitly negated in the source text "
-            "(e.g. 'failed to demonstrate', 'no significant effect')."
+            "True only if the relation itself is explicitly negated in the source text "
+            "(e.g. 'failed to demonstrate', 'no significant effect', 'X does not regulate Y'). "
+            "Do NOT set this based on Layer 4 absence flags: an entity being ABSENT from the "
+            "studied system is context, and the relations it participates in are often positive "
+            "findings about what happens in its absence."
         )
     )
 

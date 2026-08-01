@@ -70,16 +70,19 @@ def _build_prompt(chunk: dict) -> List[dict]:
     if entities:
         entity_block = "\nPRE-TAGGED ENTITIES FROM LAYER 4:\n" + "\n".join(
             f"  [{e['text']}] type={e.get('label', '?')}  "
-            f"{'[NEGATED]' if e.get('negated') else ''}"
+            f"{'[ABSENT — context only; do not set negated=True automatically]' if e.get('negated') else ''}"
             for e in entities
         )
 
     negation_block = ""
     if negated:
         negation_block = (
-            f"\nNEGATION FLAG: {len(negated)} entity/entities marked ABSENT by Layer 4: "
+            f"\nCONTEXT NOTE: Layer 4 marks {len(negated)} entity/entities ABSENT from the studied system: "
             + ", ".join(f"[{e['text']}]" for e in negated)
-            + "\nSet negated=True for any relation involving these entities."
+            + "\nAbsence is context, not negation. Relations involving these entities are often POSITIVE "
+              "findings about what happens in their absence. "
+              "Set negated=True ONLY when the text explicitly denies the relation itself "
+              "(e.g. 'X does not regulate Y', 'no effect of X on Y')."
         )
 
     system = (

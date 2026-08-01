@@ -197,17 +197,19 @@ def _user_message(chunk: dict) -> str:
     if entities:
         entity_block = "\n\nPRE-TAGGED ENTITIES FROM LAYER 4:\n" + "\n".join(
             f"  [{e['text']}]  type={e.get('label', '?')}  "
-            f"{'[NEGATED — set negated=true for any relation involving this entity]' if e.get('negated') else ''}"
+            f"{'[ABSENT — entity not present in the studied system; do NOT set negated=true for relations involving it unless the text explicitly denies them]' if e.get('negated') else ''}"
             for e in entities
         )
 
     negation_block = ""
     if negated:
         negation_block = (
-            f"\n\nNEGATION FLAG: Layer 4 detected negation in this chunk. "
-            f"The following entities are ABSENT: "
+            f"\n\nCONTEXT NOTE: Layer 4 flags the following entities as ABSENT from the studied system: "
             + ", ".join(f"[{e['text']}]" for e in negated)
-            + "\nSet negated=true for any relation involving these entities."
+            + "\nAbsence is context, not negation. Relations involving these entities are often POSITIVE "
+              "findings about what happens in their absence (e.g. 'X deficiency causes Y'). "
+              "Set negated=true ONLY when the text explicitly denies the relation itself "
+              "(e.g. 'X does not regulate Y', 'no effect of X on Y')."
         )
 
     return (
