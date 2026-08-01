@@ -1,12 +1,17 @@
 """
 Layer 4 — Negation Detector
 
-NLI cross-encoder that classifies each entity's containing clause against the
-hypothesis that the clause reports a confirmed positive finding.
+NLI cross-encoder that classifies every sentence mentioning an entity against
+the hypothesis that the clause reports a confirmed positive finding.
 
 Sentences are split at contrastive conjunctions ("but not", "however",
 "although"…) before classification so that entities in the positive branch
 of a contrastive sentence are not incorrectly flagged as negated.
+
+Each entity is classified across ALL of its sentence contexts, not just the
+first mention. An entity is ABSENT only if it is negated in every context;
+if contexts conflict the entity is marked MIXED, so sentence order never
+determines the label.
 """
 import os
 import re
@@ -82,32 +87,52 @@ class NegationDetector:
         contradiction_score = float(probs[0])
         return contradiction_score > self._THRESHOLD, round(contradiction_score, 3)
 
-    def _find_sentence(self, doc, entity_text: str, start_char: int) -> str:
-        if start_char >= 0:
-            for sent in doc.sents:
-                if sent.start_char <= start_char < sent.end_char:
-                    return sent.text
-        # PubTator3 entities lack char offsets — fall back to text search
-        for sent in doc.sents:
-            if entity_text.lower() in sent.text.lower():
-                return sent.text
-        return doc.text
-    
+    def _entity_sentences(self, doc, entity_text: str) -> list:
+        """Return every sentence in doc that mentions entity_text (all occurrences)."""
+        low = (entity_text or "").lower().strip()
+        if not low:
+            return []
+        return [sent.text for sent in doc.sents if low in sent.text.lower()]
+
     def process(self, entities: list, doc) -> dict:
         clause_cache: dict = {}
         updated = []
         negated = []
 
         for ent in entities:
-            sentence = self._find_sentence(doc, ent["text"], ent.get("start", -1))
-            clause   = _extract_entity_clause(sentence, ent["text"])
+            sentences = self._entity_sentences(doc, ent["text"])
+            seen_clauses = set()
+            results = []
+            for sentence in sentences:
+                clause = _extract_entity_clause(sentence, ent["text"])
+                if clause in seen_clauses:
+                    continue
+                seen_clauses.add(clause)
+                if clause not in clause_cache:
+                    clause_cache[clause] = self._is_negated(clause)
+                results.append(clause_cache[clause])
 
-            if clause not in clause_cache:
-                clause_cache[clause] = self._is_negated(clause)
-            is_neg, confidence = clause_cache[clause]
+            total     = len(results)
+            neg_count = sum(1 for is_neg, _ in results if is_neg)
 
-            assertion = "ABSENT" if is_neg else "PRESENT"
-            entry = {**ent, "negated": is_neg, "assertion": assertion, "confidence": confidence}
+            if total > 0 and neg_count == total:
+                assertion = "ABSENT"
+                is_neg    = True
+            elif neg_count > 0:
+                assertion = "MIXED"
+                is_neg    = False
+            else:
+                assertion = "PRESENT"
+                is_neg    = False
+
+            entry = {
+                **ent,
+                "negated":          is_neg,
+                "assertion":        assertion,
+                "confidence":       round(max(c for _, c in results), 3) if results else 0.0,
+                "contexts_checked": total,
+                "negated_contexts": neg_count,
+            }
             updated.append(entry)
             if is_neg:
                 negated.append(entry)
