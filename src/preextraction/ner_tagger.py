@@ -7,6 +7,38 @@ and numeric-only spans.
 """
 
 
+SCISPACY_LABEL_MAP: dict[str, str] = {
+    # bc5cdr
+    "CHEMICAL":                  "SMALL_MOLECULE",
+    "DISEASE":                   "DISEASE",
+    # jnlpba
+    "DNA":                       "GENE",
+    "RNA":                       "NON_CODING_RNA",
+    "PROTEIN":                   "PROTEIN",
+    "CELL_TYPE":                 "CELL_TYPE",
+    "CELL_LINE":                 "CELL_LINE",
+    # bionlp13cg
+    "AMINO_ACID":                "SMALL_MOLECULE",
+    "ANATOMICAL_SYSTEM":         "ANATOMY",
+    "CANCER":                    "CANCER",
+    "CELL":                      "CELL_TYPE",
+    "CELLULAR_COMPONENT":        "CELLULAR_COMPONENT",
+    "DEVELOPING_ANATOMICAL_STRUCTURE": "ANATOMY",
+    "GENE_OR_GENE_PRODUCT":      "GENE",
+    "IMMATERIAL_ANATOMICAL_ENTITY":    "ANATOMY",
+    "MULTI_TISSUE_STRUCTURE":    "ANATOMY",
+    "ORGAN":                     "ANATOMY",
+    "ORGANISM":                  "ORGANISM",
+    "ORGANISM_SUBDIVISION":      "ANATOMY",
+    "ORGANISM_SUBSTANCE":        "SMALL_MOLECULE",
+    "PATHOLOGICAL_FORMATION":    "PATHOLOGICAL_PROCESS",
+    "SIMPLE_CHEMICAL":           "SMALL_MOLECULE",
+    "TISSUE":                    "TISSUE",
+    # en_core_sci_lg
+    "ENTITY":                    "OTHER",
+}
+
+
 class NERTagger:
     @staticmethod
     def _is_valid(text: str) -> bool:
@@ -31,7 +63,7 @@ class NERTagger:
             entities.append({
                 "text":       ent.text,
                 "normalized": normalized,
-                "label":      ent.label_,
+                "label":      SCISPACY_LABEL_MAP.get(ent.label_, "OTHER"),
                 "start":      ent.start_char,
                 "end":        ent.end_char,
                 "negated":    False,

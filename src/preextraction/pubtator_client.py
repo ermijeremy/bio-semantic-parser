@@ -15,6 +15,15 @@ _PUBTATOR3_URL = (
     "https://www.ncbi.nlm.nih.gov/research/pubtator3-api/publications/export/biocjson"
 )
 
+PUBTATOR_TYPE_MAP: dict[str, str] = {
+    "Gene":     "GENE",
+    "Disease":  "DISEASE",
+    "Chemical": "SMALL_MOLECULE",
+    "Species":  "ORGANISM",
+    "Mutation": "GENOMIC_VARIANT",
+    "CellLine": "CELL_LINE",
+}
+
 
 def fetch_pubtator_entities(pmid: str, timeout: int = 15) -> List[Dict]:
     """
@@ -50,7 +59,7 @@ def fetch_pubtator_entities(pmid: str, timeout: int = 15) -> List[Dict]:
                 seen.add(normalized)
 
                 infons     = ann.get("infons", {})
-                label      = infons.get("type", "")
+                label      = PUBTATOR_TYPE_MAP.get(infons.get("type", ""), "OTHER")
                 identifier = infons.get("identifier", "") or infons.get("normalized_id", "")
 
                 loc   = ann.get("locations", [{}])[0]
