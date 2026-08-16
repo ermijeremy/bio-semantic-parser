@@ -1,0 +1,8 @@
+# torch is installed from the CPU wheel index in the Dockerfile.
+fastcoref==2.1.6
+# fastcoref 2.1.6 needs the transformers 4.30 line; newer releases break model loading.
+transformers==4.30.2
+tokenizers==0.13.3
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4

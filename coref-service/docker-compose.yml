@@ -1,0 +1,19 @@
+services:
+  coref-service:
+    # Pulls the prebuilt image (no local build needed): docker compose pull && docker compose up -d
+    image: ghcr.io/lnamty/coref-service:lingmess
+    build: .   # only used if you build locally with: docker compose build
+    container_name: coref-service
+    ports:
+      - "5000:5000"
+    environment:
+      COREF_MODEL: lingmess        # lingmess or fcoref
+      COREF_DEVICE: cpu            # cpu or cuda:0
+      COREF_RESOLVE_MODE: anaphora # anaphora or pronouns_only
+      COREF_PRELOAD: "true"
+      HF_HUB_DISABLE_XET: "1"
+    volumes:
+      - coref-models:/models       # cache the downloaded model weights
+
+volumes:
+  coref-models:
