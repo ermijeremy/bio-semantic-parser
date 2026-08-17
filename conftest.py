@@ -102,3 +102,68 @@ if "openai" not in sys.modules:
 if "instructor" not in sys.modules:
     _instructor = _stub_module("instructor")
     _instructor.patch = MagicMock(return_value=MagicMock())
+
+# spacy + scispacy
+# preextractor.py does `import spacy` at module level and calls spacy.load(),
+# spacy.blank(), and spacy.util.filter_spans() — stub them all so CI never
+# needs to download the large scispaCy NER model packages.
+if "spacy" not in sys.modules:
+    class _FakeSpan:
+        def __init__(self, text="", label_="", start_char=0, end_char=0):
+            self.text       = text
+            self.label_     = label_
+            self.start_char = start_char
+            self.end_char   = end_char
+            self.start      = 0
+            self.end        = 0
+
+    class _FakeDoc:
+        def __init__(self, text=""):
+            self.text = text
+            self.ents  = []
+            self.sents = []
+
+        def char_span(self, start, end, label="", alignment_mode="strict"):
+            return _FakeSpan(self.text[start:end], label, start, end)
+
+        def __iter__(self):
+            return iter([])
+
+    class _FakeNLP:
+        def __call__(self, text):
+            return _FakeDoc(text)
+
+        def add_pipe(self, name, **kwargs):
+            pass
+
+    class _FakeSpacyUtil:
+        @staticmethod
+        def filter_spans(spans):
+            return spans
+
+    _spacy = _stub_module("spacy")
+    _spacy.load  = MagicMock(return_value=_FakeNLP())
+    _spacy.blank = MagicMock(return_value=_FakeNLP())
+
+    _spacy_util = _stub_module("spacy.util")
+    _spacy_util.filter_spans = _FakeSpacyUtil.filter_spans
+    _spacy.util = _spacy_util
+
+    _stub_module("spacy.language")
+    _stub_module("spacy.tokens")
+    _stub_module("scispacy")
+
+# gliner
+# gliner_tagger.py does `from gliner import GLiNER` inside a lazy function.
+# Stub GLiNER.from_pretrained so model weights are never downloaded in CI.
+if "gliner" not in sys.modules:
+    class _FakeGLiNER:
+        @classmethod
+        def from_pretrained(cls, model_id, *args, **kwargs):
+            return cls()
+
+        def predict_entities(self, text, labels, threshold=0.5, flat_ner=True):
+            return []  # return no entities — safe no-op for tests
+
+    _gliner_mod = _stub_module("gliner")
+    _gliner_mod.GLiNER = _FakeGLiNER
